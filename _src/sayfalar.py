@@ -141,6 +141,112 @@ BOLGE_VIDEO = {
 }
 
 
+# Marka sayfaları için saha videoları. ⚠️ Etiketler videonun İÇERİĞİNİ anlatır; hiçbiri
+# "bu çekim şu markada yapıldı" iddiası taşımaz — parça ve işlem mantığı markalar arasında
+# büyük ölçüde ortak olduğu için videolar marka ayrımı yapmadan gösteriliyor.
+# Her markaya buzdolabı + çamaşır makinesi + bulaşık/dondurucu üçlüsü düşüyor; üçlüler
+# 12 marka sayfasında birbirini tekrar etmeyecek şekilde dağıtıldı.
+MARKA_VIDEO = {
+"arcelik": [
+ ("buzdolabi-kacak-arizasi.mp4", "buzdolabi-motor-karti-degisimi.webp",
+  "Buzdolabında kaçak tespiti"),
+ ("camasir-makinesi-kazan-arizasi2.mp4", "arizali-camasir-makinesi.webp",
+  "Çamaşır makinesi kazan arızası"),
+ ("bulasik-makinesi-kart-degisim.mp4", "bulasik-makinesi-kart-degisim-arizasi.webp",
+  "Bulaşık makinesi kart değişimi"),
+],
+"beko": [
+ ("buzdolabi-kart-degisim2.mp4", "buzdolabi-kart-degisimi2.webp",
+  "Buzdolabı elektronik kart değişimi"),
+ ("camasir-makinesi-pompa-motoru-arizasi.mp4", "su-bosaltma-motoru-degisimi.webp",
+  "Pompa motoru arızası"),
+ ("bulasik-makinesi-svic-arizasi.mp4", "bulasik-makinesi-pervane-degisimi.webp",
+  "Bulaşık makinesi sviç arızası"),
+],
+"altus": [
+ ("buzdolabi-arka-fan-sesi.mp4", "buzdolabi-fan-degisim.webp",
+  "Buzdolabı arka fan sesi"),
+ ("camasir-makinesi-sase-degisim.mp4", "camasir-makinesi-pas-temizligi.webp",
+  "Çamaşır makinesi şase değişimi"),
+ ("bulasik-makinesi-motor-ariza-sesi.mp4", "bulasik-makinesi-ariza.webp",
+  "Bulaşık makinesi motor arıza sesi"),
+],
+"grundig": [
+ ("buzdolabi-arka-hortum-gider-temizligi.mp4", "buzdolabi-mentese-degisimi.webp",
+  "Buzdolabı arka gider temizliği"),
+ ("camasir-makinesi-on-panel-degisim.mp4", "camasir-makinesi-karti2.webp",
+  "Çamaşır makinesi ön panel değişimi"),
+ ("bulasik-makinesi-su-kacak-tespiti.mp4", "bulasik-makinesi-ariza.webp",
+  "Bulaşık makinesinde su kaçağı tespiti"),
+],
+"bosch": [
+ ("buzdolabi-gaz-kacagi-govde-degisim.mp4", "buzdolabi-motor-karti-degisimi3.webp",
+  "Gaz kaçağında gövde onarımı"),
+ ("camasir-makinesi-isitici-rezidans-degisim.mp4", "camasir-makinesi-karti.webp",
+  "Isıtıcı (rezistans) değişimi"),
+ ("bulasik-makinesi-kart-degisim2.mp4", "bulasik-makinesi-kart-degisim-arizasi.webp",
+  "Bulaşık makinesi kart değişimi"),
+],
+"siemens": [
+ ("buzdolabi-kart-degisim.mp4", "buzdolabi-kart-degisim.webp",
+  "Buzdolabı kart değişimi"),
+ ("camasir-makinesi-kapi-kilit-arizasi.mp4", "camasir-makinesi-karti2.webp",
+  "Çamaşır makinesi kapı kilidi arızası"),
+ ("derin-dondurucu-motor-arizasi.mp4", "buzmatik-ariza-tespit.webp",
+  "Derin dondurucu motor arızası"),
+],
+"profilo": [
+ ("buzdolabi-koprosor-degisimi.mp4", "buzdolabi-motor-degisim3.webp",
+  "Buzdolabı kompresör (motor) değişimi"),
+ ("camasir-makines-kapi-kilidi-arizasi.mp4", "camasir-makinesi-karti2.webp",
+  "Çamaşır makinesi kapı kilidi arızası"),
+ ("bulasik-makinesi-kart-degisim.mp4", "bulasik-makinesi-kart-degisim-arizasi.webp",
+  "Bulaşık makinesi kart değişimi"),
+],
+"vestel": [
+ ("buzdolabi-kacak-arizasi.mp4", "buzdolabi-motor-karti-degisimi.webp",
+  "Buzdolabında kaçak tespiti"),
+ ("camasir-makinesi-cocuk-kilidi-arizasi.mp4", "camasir-makinesi-karti.webp",
+  "Çamaşır makinesi çocuk kilidi arızası"),
+ ("bulasik-makinesi-svic-arizasi.mp4", "bulasik-makinesi-pervane-degisimi2.webp",
+  "Bulaşık makinesi sviç arızası"),
+],
+"regal": [
+ ("buzdolabi-kart-degisim2.mp4", "buzdolabi-kart-degisimi2.webp",
+  "Buzdolabı elektronik kart değişimi"),
+ ("camasir-makinesi-kazan-arizasi3.mp4", "motoru-arizali-camasir-makinesi.webp",
+  "Çamaşır makinesi kazan arızası"),
+ ("bulasik-makinesi-motor-ariza-sesi.mp4", "bulasik-makinesi-sepet-degisimi.webp",
+  "Pompa motorundan gelen arıza sesi"),
+],
+"seg": [
+ ("buzdolabi-arka-fan-sesi.mp4", "buzdolabi-fan-degisim2.webp",
+  "Arıza yapan buzdolabı fanının sesi"),
+ ("camasir-makinesi-arizali-motor-sesi.mp4", "motoru-arizali-camasir-makinesi.webp",
+  "Arızalı çamaşır makinesi motorunun sesi"),
+ ("bulasik-makinesi-su-kacak-tespiti.mp4", "bulasik-makinesi-ariza.webp",
+  "Bulaşık makinesi su kaçağı tespiti"),
+],
+"samsung": [
+ ("buzdolabi-arka-hortum-gider-temizligi.mp4", "buzdolabi-mentese-degisimi2.webp",
+  "Buzdolabı arka gider hortumu temizliği"),
+ # ⛔ Bu videonun dosya adında arıza kodu geçiyor; ETİKETTE geçmiyor — işletmenin kararı.
+ ("camasir-makinesi-3e-arizasi.mp4", "camasir-makinesi-kart-degisimi-arizasi.webp",
+  "Çamaşır makinesi arıza tespiti"),
+ ("bulasik-makinesi-kart-degisim2.mp4", "bulasik-makinesi-kart-degisim-arizasi.webp",
+  "Bulaşık makinesi kart değişimi"),
+],
+"lg": [
+ ("buzdolabi-gaz-kacagi-govde-degisim.mp4", "buzdolabi-motor-karti-degisimi2.webp",
+  "Gaz kaçağı — gövde değişimi"),
+ ("arizali-camasir-makinesi-sesi.mp4", "arizali-camasir-makinesi.webp",
+  "Arızalı çamaşır makinesi sesi"),
+ ("derin-dondurucu-motor-arizasi.mp4", "buzmatik-ariza-tespit-ve-tamir.webp",
+  "Derin dondurucu motor arızası"),
+],
+}
+
+
 def saha_videolari(liste, baslik, giris, alt=True):
     """Kapak desenli video şeridi. Dosya yoksa video_kapak sessizce yorum düşer."""
     kutular = "".join(video_kapak(v, p, e) for v, p, e in liste)
@@ -824,7 +930,11 @@ takılmasını sağlıyoruz. Süreç boyunca sizi bilgilendiriyoruz. Taktığım
 <p class="tbl-not">Onarımı bize yaptırırsanız çağrı ücretinde indirim uygulanır.</p></div>
 </div></div></section>
 
-{sss_bolumu(marka_sss(m), f"Batman {m['ad']} servisi hakkında sık sorulan sorular", alt=True)}
+{saha_videolari(MARKA_VIDEO.get(m["slug"], []), "Sahadan görüntüler",
+                "Aşağıdaki görüntüler stok video değil — Batman'da kendi yaptığımız onarımlardan. "
+                "Videolar tek markaya ait değil; parça ve işlem mantığı markalar arasında büyük "
+                "ölçüde ortak olduğu için marka ayrımı yapmadan gösteriyoruz.")}
+{sss_bolumu(marka_sss(m), f"Batman {m['ad']} servisi hakkında sık sorulan sorular")}
 {capraz_ag("marka-" + m["slug"], marka_sayi=6, bolge_sayi=6)}"""
 
 
