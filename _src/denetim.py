@@ -4,6 +4,7 @@
 Hata bulursa 1 döner. Commit'ten ÖNCE çalıştır.
 Kontroller: kırık iç link · eksik görsel/video · yinelenen title/description ·
 geçersiz JSON-LD · H1 sayısı · sayfa ağırlığı · dış kaynak · yetim sayfa ·
+sessizce düşen görsel/video ·
 canonical doğruluğu · title/description uzunluğu · alt metni · OG/Twitter ·
 sitemap kapsaması ve lastmod · şema düğüm bütünlüğü.
 """
@@ -60,6 +61,9 @@ def main():
             aciklamalar[v].append(url)
             if len(v) > 175:
                 uyarilar.append(f"{url} description uzun ({len(v)} kr)")
+
+        for y in re.findall(r"<!-- eksik [^>]*>", s):
+            hatalar.append(f"{url} SESSİZ DÜŞEN VARLIK: {y}")
 
         h1 = re.findall(r"<h1[ >]", s)
         if len(h1) != 1:

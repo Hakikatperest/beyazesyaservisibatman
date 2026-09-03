@@ -486,7 +486,7 @@ bağımsız bir servise yaptıracağınız müdahale garantinizi düşürebilir.
 </div></section>""")
 
     # ---------------------------------------------------------- H2: Bilinmesi gerekenler + video
-    v1 = video_kapak("beyaz-esya-servisi.mp4", "batman-beyaz-esya-servisi-nasil-calisir.webp",
+    v1 = video_kapak("beyaz-esya-servisi.mp4", "batman-beyaz-esya-servisi-hero.webp",
                      "Sahada çalışırken", dikey=True)
     v2 = video_kapak("camasir-makinesi-kazan-arizasi.mp4", "arizali-camasir-makinesi.webp",
                      "Çamaşır makinesi kazan arızası", dikey=True)

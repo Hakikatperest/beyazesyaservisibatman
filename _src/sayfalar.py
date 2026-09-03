@@ -113,7 +113,7 @@ CIHAZ_VIDEO = {
 
 BOLGE_VIDEO = {
 "batman-merkez": [
- ("beyaz-esya-servisi.mp4", "batman-beyaz-esya-servisi-nasil-calisir.webp", "Sahada çalışırken"),
+ ("beyaz-esya-servisi.mp4", "batman-beyaz-esya-servisi-hero.webp", "Sahada çalışırken"),
  ("camasir-makinesi-servisi.mp4", "camasir-makinesi-motor-degisimi.webp", "Çamaşır makinesi servisi"),
 ],
 "besiri": [
