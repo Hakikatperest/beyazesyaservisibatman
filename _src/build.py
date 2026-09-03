@@ -15,6 +15,18 @@ import media
 KOK = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 I = D.ISLETME
 SITE = D.SITE
+# WhatsApp'a hazır mesajla giriş — dönüşümü artırır, kullanıcı boş ekrana bakmaz
+# ⛔ batman-beyaz-esya-servisi-nasil-calisir.webp KULLANILMIYOR: o afişteki telefon
+#    (0554 166 25 72) sitedeki numaradan farklı. Yerine 2026-09-03'te yüklenen,
+#    doğru numarayı (0553 711 83 21) taşıyan hero afişi kullanılıyor.
+VARSAYILAN_OG = "batman-beyaz-esya-servisi-hero.webp"
+
+YAYIN_TARIHI = "2026-09-03"
+GUNCELLEME_TARIHI = os.environ.get("SITE_TARIHI") or __import__("datetime").date.today().isoformat()
+
+WA_LINK = ("https://wa.me/" + I["wa"] +
+           "?text=Merhaba%2C%20Batman%20Beyaz%20E%C5%9Fya%20Servisi%27nden%20"
+           "ar%C4%B1za%20i%C3%A7in%20yaz%C4%B1yorum.")
 
 # ------------------------------------------------------------------ yardımcılar
 
@@ -67,6 +79,27 @@ def yonelme(ad):
     return f"{ad}'{y}{a}"
 
 
+def baslik_kes(ana, ekler=("Batman Beyaz Eşya Servisi", "Batman Servisi"), sinir=65):
+    """SERP ~60-65 karakterde kesiyor. Marka eki sığmıyorsa kısaltır, yine sığmazsa düşürür."""
+    for ek in ekler:
+        aday = f"{ana} | {ek}"
+        if len(aday) <= sinir:
+            return aday
+    return ana
+
+
+def turevler(ad):
+    """srcset dizesi — <link rel=preload imagesrcset> için."""
+    kaynak = os.path.join(KOK, "images", ad)
+    if not os.path.exists(kaynak):
+        return ""
+    g, _ = media.olcu(ad)
+    setler = [f"/images/w{w}/{ad} {w}w" for w in media.GENISLIKLER
+              if os.path.exists(os.path.join(KOK, "images", f"w{w}", ad))]
+    setler.append(f"/images/{ad} {g}w")
+    return ", ".join(setler)
+
+
 def resim(ad, alt, sinif="", boy="100vw", oncelik=False, oran=None):
     """images/ içindeki dosyadan srcset'li <picture> üretir.
     ⚠️ srcset dosya sisteminden okunur — olmayan türev için 404 üretme."""
@@ -80,7 +113,10 @@ def resim(ad, alt, sinif="", boy="100vw", oncelik=False, oran=None):
             setler.append(f"/images/w{w}/{ad} {w}w")
     setler.append(f"/images/{ad} {g}w")
     yukleme = 'loading="eager" fetchpriority="high"' if oncelik else 'loading="lazy" decoding="async"'
-    stil = f' style="aspect-ratio:{oran}"' if oran else ""
+    # oran verilirse kutu sabitlenir ve görsel kırpılır; verilmezse doğal oran korunur
+    # (afişlerde basılı yazı var — onlara oran VERME).
+    stil = (f' style="aspect-ratio:{oran};height:auto;object-fit:cover"' if oran
+            else ' style="height:auto"')
     return (
         f'<picture class="{sinif}">'
         f'<img src="/images/{ad}" srcset="{", ".join(setler)}" sizes="{boy}" '
@@ -202,10 +238,17 @@ def kirinti(yol_listesi):
                      **({"item": SITE + url} if url else {})})
     nav = (f'<nav class="kirinti" aria-label="Site haritası"><div class="kap">'
            f'<ol>{"".join(ogeler)}</ol></div></nav>')
+    son = yol_listesi[-1][1] or ""
     return nav, {"@type": "BreadcrumbList", "itemListElement": sema}
 
 
 # ------------------------------------------------------------------ şema
+
+def web_site_sema():
+    return {"@type": "WebSite", "@id": SITE + "/#site", "url": SITE + "/",
+            "name": I["ad"], "inLanguage": "tr-TR",
+            "publisher": {"@id": SITE + "/#isletme"}}
+
 
 def yerel_isletme_sema():
     return {
@@ -214,7 +257,7 @@ def yerel_isletme_sema():
         "name": I["ad"],
         "url": SITE + "/",
         "telephone": I["tel_link"],
-        "image": SITE + "/images/batman-beyaz-esya-servisi-nasil-calisir.webp",
+        "image": SITE + "/images/" + VARSAYILAN_OG,
         "logo": SITE + "/images/logo/logo-380.png",
         "address": {
             "@type": "PostalAddress",
@@ -242,10 +285,28 @@ def yerel_isletme_sema():
             "about": I["belge"]["dal"],
         },
         "currenciesAccepted": "TRY",
+        "paymentAccepted": "Nakit, Kredi Kartı, Havale/EFT",
+        "description": ("Batman merkez ve ilçelerinde buzdolabı, çamaşır makinesi, bulaşık "
+                        "makinesi ve derin dondurucu onarımı yapan beyaz eşya teknik servisi. "
+                        "Aynı gün yerinde servis, 1 yıl parça garantisi."),
+        "slogan": "Önce teşhis, sonra fiyat.",
+        "sameAs": [I["maps"]],
+        "numberOfEmployees": {"@type": "QuantitativeValue", "minValue": 1},
         "knowsAbout": [c["ad"] + " tamiri" for c in D.CIHAZLAR],
         "makesOffer": [
-            {"@type": "Offer", "itemOffered": {"@type": "Service",
-             "name": f"Batman {c['ad'].lower()} tamiri"}} for c in D.CIHAZLAR
+            {"@type": "Offer",
+             "itemOffered": {"@type": "Service", "name": f"Batman {c['ad'].lower()} tamiri",
+                             "serviceType": f"{c['ad']} tamiri", "provider": {"@id": SITE + "/#isletme"}},
+             "areaServed": [{"@type": "AdministrativeArea", "name": b["ad"]} for b in D.BOLGELER],
+             "availability": "https://schema.org/InStock"} for c in D.CIHAZLAR
+        ] + [
+            {"@type": "Offer", "name": "Servis (yol) ücreti — Batman merkez ve ilçeler",
+             "description": "Arızanın yerinde tespiti karşılığıdır; ilçelere ayrı yol ücreti alınmaz.",
+             "priceSpecification": {"@type": "PriceSpecification",
+                                    "price": D.SERVIS_UCRETI["merkez"], "priceCurrency": "TRY"}},
+            {"@type": "Offer", "name": "Servis (yol) ücreti — Batman köyleri",
+             "priceSpecification": {"@type": "PriceSpecification",
+                                    "price": D.SERVIS_UCRETI["koy"], "priceCurrency": "TRY"}},
         ],
     }
 
@@ -263,15 +324,21 @@ IKON = {
     "araba": '<svg viewBox="0 0 24 24"><path d="M18.9 6.5A1.5 1.5 0 0017.5 5.5h-11A1.5 1.5 0 005.1 6.5L3 12.5V20a1 1 0 001 1h1a1 1 0 001-1v-1h12v1a1 1 0 001 1h1a1 1 0 001-1v-7.5l-2.1-6zM6.5 16A1.5 1.5 0 118 14.5 1.5 1.5 0 016.5 16zm11 0a1.5 1.5 0 111.5-1.5 1.5 1.5 0 01-1.5 1.5zM5 11l1.5-4.5h11L19 11z"/></svg>',
     "arac": '<svg viewBox="0 0 24 24"><path d="M22 7h-3V5a2 2 0 00-2-2H3a1 1 0 00-1 1v12a1 1 0 001 1h1.2a2.8 2.8 0 005.6 0h4.4a2.8 2.8 0 005.6 0H22a1 1 0 001-1v-6a2 2 0 00-1-2zM7 18.5A1.5 1.5 0 118.5 17 1.5 1.5 0 017 18.5zm10 0a1.5 1.5 0 111.5-1.5 1.5 1.5 0 01-1.5 1.5zm4-5.5h-2V9h2z"/></svg>',
     "arti": '<svg viewBox="0 0 24 24"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg>',
+    "posta": '<svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5z"/></svg>',
+    "anahtar": '<svg viewBox="0 0 24 24"><path d="M21.7 5.6l-3.4 3.4-2.3-2.3 3.4-3.4a6 6 0 00-7.7 7.3L3 19.3 4.7 21l8.7-8.7a6 6 0 007.3-7.7z"/></svg>',
+    "simsek": '<svg viewBox="0 0 24 24"><path d="M13 2L4.5 13.5H11l-1 8.5 8.5-11.5H12z"/></svg>',
+    "kamera": '<svg viewBox="0 0 24 24"><path d="M17 10.5V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1v-3.5l4 3.5V7z"/></svg>',
+    "belge": '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></svg>',
+    "kar": '<svg viewBox="0 0 24 24"><path d="M11 2h2v4.6l2.6-2.6 1.4 1.4L13 9.4v2.1l1.8-1 1.9-3.3 1.9.5-1.1 1.9 2.6-.7.5 1.9-2.6.7 1.4 1.6-1.6 1.1-2.3-2.7-1.8 1 1.8 1-.1 3.3-1.9.5-.5-2.1-2.6 1.5v3l-1 1-1-1v-3L6.8 16l-.5 2.1-1.9-.5-.1-3.3 1.8-1-1.8-1-2.3 2.7L.4 14l1.4-1.6-2.6-.7.5-1.9 2.6.7L1.2 8.6l1.9-.5 1.9 3.3 1.8 1V10.3L2.9 5.4l1.4-1.4L11 6.6z"/></svg>',
 }
 
 MENU = [
     ("Cihazlar", "/#cihazlar"),
     ("Markalar", "/#markalar"),
     ("Arıza Rehberi", "/#ariza-rehberi"),
+    ("Galeri", "/#galeri"),
     ("Ücretler", "/#ucretler"),
     ("Bölgeler", "/#bolgeler"),
-    ("İletişim", "/#iletisim"),
 ]
 
 
@@ -285,43 +352,70 @@ def ust_bar():
 <span class="logo-ad"><b>Batman Beyaz Eşya</b><span>Teknik Servis</span></span></a>
 <button class="ham" id="ham" aria-label="Menüyü aç" aria-expanded="false" aria-controls="menu">
 <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-<nav class="menu" id="menu">{menu}</nav>
+<nav class="menu" id="menu" aria-label="Ana menü">{menu}</nav>
 <div class="ust-ara">
-<a class="dg dg-wa dg-kucuk" href="https://wa.me/{I['wa']}" rel="noopener" target="_blank">{IKON['wa']}<span>WhatsApp</span></a>
-<a class="dg dg-ara dg-kucuk" href="tel:{I['tel_link']}">{IKON['tel']}<span>{I['tel_yazi']}</span></a>
+<a class="tel-kart" href="tel:{I['tel_link']}" aria-label="Telefonla ara: {I['tel_yazi']}">
+<i>{IKON['tel']}</i><span><em>7/24 Acil Servis</em><b>{I['tel_yazi']}</b></span></a>
+<a class="dg dg-wa dg-kucuk" href="{WA_LINK}" rel="noopener" target="_blank">{IKON['wa']}<span>WhatsApp</span></a>
 </div></div></header>"""
+
+
+def yuzen_iletisim():
+    """Sağ kenarda sabit duran hızlı iletişim kartı (geniş ekran)."""
+    return f"""<aside class="yuzen" aria-label="Hızlı iletişim">
+<a class="dg dg-ara dg-kucuk" href="tel:{I['tel_link']}">{IKON['tel']}Hemen Ara</a>
+<a class="dg dg-wa dg-kucuk" href="{WA_LINK}" rel="noopener" target="_blank">{IKON['wa']}WhatsApp</a>
+</aside>"""
 
 
 def alt_bilgi():
     cihaz = "".join(f'<li><a href="/batman-{c["slug"]}-tamircisi/">{k(c["baslik"])}</a></li>'
                     for c in D.CIHAZLAR)
     marka = "".join(f'<li><a href="/batman-{m["slug"]}-servisi/">Batman {k(m["ad"])} Servisi</a></li>'
-                    for m in D.MARKALAR[:6])
-    bolge = "".join(f'<li><a href="/{b["slug"]}-beyaz-esya-servisi/">{k(b["ad"])}</a></li>'
+                    for m in D.MARKALAR[:5])
+    bolge = "".join(f'<li><a href="/{b["slug"]}-beyaz-esya-servisi/">{k(b["ad"])} Beyaz Eşya Servisi</a></li>'
                     for b in D.BOLGELER)
-    return f"""<footer class="alt-bilgi"><div class="kap">
+    return f"""<footer class="alt-bilgi">
+<div class="alt-ust"><div class="kap">
+<b>{k(I['ad'])} — 7/24 acil beyaz eşya teknik servisi</b>
+<a class="dg dg-wa dg-kucuk" href="{WA_LINK}" rel="noopener" target="_blank">{IKON['wa']}WhatsApp'tan yaz</a>
+</div></div>
+<div class="kap">
 <div class="alt-izgara">
 <div>
 <div class="alt-logo"><img class="logo-im" src="/images/logo/logo-180.webp" width="180" height="165"
- alt="Batman Beyaz Eşya Servisi" loading="lazy"><span>{k(I['ad'])}</span></div>
-<p class="alt-kunye">{k(I['adres_sokak'])}<br>{k(I['posta'])} {k(I['adres_ilce'])} / {k(I['adres_il'])}</p>
-<a class="alt-tel" href="tel:{I['tel_link']}">{IKON['tel']}{I['tel_yazi']}</a>
-<p class="alt-kunye" style="margin-top:14px">Batman merkez ve tüm ilçelere beyaz eşya teknik servisi.</p>
+ alt="Batman Beyaz Eşya Servisi" loading="lazy" decoding="async"><span>{k(I['ad'])}</span></div>
+<p class="alt-kunye">Batman merkez ve tüm ilçelerde buzdolabı, çamaşır makinesi, bulaşık makinesi
+ve derin dondurucu onarımı. Sekiz yılı aşkın saha tecrübesi, 1 yıl parça garantisi.</p>
+<p style="margin-top:18px"><a class="dg dg-ara dg-kucuk" href="tel:{I['tel_link']}">{IKON['tel']}{I['tel_yazi']}</a></p>
 </div>
 <div><h4>Cihazlar</h4><ul class="alt-liste">{cihaz}</ul></div>
 <div><h4>Markalar</h4><ul class="alt-liste">{marka}
 <li><a href="/#markalar">Tüm markalar</a></li></ul></div>
-<div><h4>Hizmet Bölgeleri</h4><ul class="alt-liste">{bolge}</ul></div>
+<div><h4>İletişim</h4>
+<ul class="alt-iletisim">
+<li><i>{IKON['pin']}</i><span><em>Adres</em><b>{k(I['adres_sokak'])}<br>{k(I['posta'])} {k(I['adres_ilce'])} / {k(I['adres_il'])}</b></span></li>
+<li><i>{IKON['tel']}</i><span><em>Telefon &amp; WhatsApp</em><b><a href="tel:{I['tel_link']}">{I['tel_yazi']}</a></b></span></li>
+<li><i>{IKON['saat']}</i><span><em>Çalışma saatleri</em><b>7 gün 24 saat — tatil ve pazar dahil</b></span></li>
+</ul>
+</div>
+</div>
+<div class="alt-izgara" style="padding-top:0;grid-template-columns:1fr">
+<div><h4>Hizmet Bölgeleri</h4><ul class="alt-liste"
+ style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0 20px">{bolge}</ul></div>
 </div>
 <div class="telif">
-<span>© 2026 {k(I['ad'])}</span>
-<span>{k(I['adres_sokak'])}, {k(I['adres_ilce'])} / {k(I['adres_il'])}</span>
+<span>© 2026 {k(I['ad'])}. Tüm hakları saklıdır.</span>
+<nav aria-label="Alt bilgi bağlantıları">
+<a href="/">Ana Sayfa</a><a href="/#ariza-rehberi">Arıza Rehberi</a>
+<a href="/#ucretler">Ücretler</a><a href="/sitemap.xml">Site Haritası</a>
+</nav>
 </div>
 <div class="w4"><span class="w4-bag"><span class="w4-etiket">Web Tasarım:</span><a class="w4-ad"
  href="https://www.web4medya.com/" target="_blank" rel="noopener">Web<span class="w4-d">4</span>Medya</a></span></div>
 </div></footer>
 <div class="mobil-cubuk">
-<a class="dg dg-wa" href="https://wa.me/{I['wa']}" rel="noopener" target="_blank">{IKON['wa']}WhatsApp</a>
+<a class="dg dg-wa" href="{WA_LINK}" rel="noopener" target="_blank">{IKON['wa']}WhatsApp</a>
 <a class="dg dg-ara" href="tel:{I['tel_link']}">{IKON['tel']}Hemen Ara</a>
 </div>"""
 
@@ -342,6 +436,13 @@ document.querySelectorAll('.video-kutu').forEach(function(kutu){
   kutu.innerHTML='';kutu.appendChild(v);
  });
 });
+// alt bilgi görünürken yüzen kart çekilsin — footer linklerini örtmesin
+var yz=document.querySelector('.yuzen'),ab=document.querySelector('.alt-bilgi');
+if(yz&&ab&&'IntersectionObserver'in window){
+ new IntersectionObserver(function(ls){
+  yz.classList.toggle('gizli',ls[0].isIntersecting);
+ },{threshold:0}).observe(ab);
+}
 // ortaya çıkış — uzun bloklara verilmiyor
 if('IntersectionObserver'in window){
  var g=new IntersectionObserver(function(ls){ls.forEach(function(l){
@@ -355,13 +456,56 @@ if('IntersectionObserver'in window){
 })();"""
 
 
-def iskelet(*, slug, baslik, aciklama, govde, semalar, kirinti_html="", og_gorsel=None):
+def iskelet(*, slug, baslik, aciklama, govde, semalar, kirinti_html="",
+            og_gorsel=None, lcp_gorsel=None, sayfa_tipi="WebPage"):
     """slug: "" = ana sayfa, aksi hâlde "batman-buzdolabi-tamircisi" gibi."""
     url = SITE + "/" + (slug + "/" if slug else "")
-    og = og_gorsel or "batman-beyaz-esya-servisi-nasil-calisir.webp"
+    og = og_gorsel or VARSAYILAN_OG
+    og_boy = media.olcu(og) or (1200, 900)
+
+    # WebPage düğümü: her sayfaya tazelik + sahiplik sinyali
+    sayfa = {
+        "@type": sayfa_tipi,
+        "@id": url + "#sayfa",
+        "url": url,
+        "name": baslik,
+        "description": aciklama,
+        "inLanguage": "tr-TR",
+        "isPartOf": {"@id": SITE + "/#site"},
+        "about": {"@id": SITE + "/#isletme"},
+        "primaryImageOfPage": {"@type": "ImageObject", "url": f"{SITE}/images/{og}",
+                               "width": og_boy[0], "height": og_boy[1]},
+        "datePublished": YAYIN_TARIHI,
+        "dateModified": GUNCELLEME_TARIHI,
+    }
+    for n in semalar:
+        if isinstance(n, dict) and n.get("@type") == "BreadcrumbList":
+            sayfa["breadcrumb"] = {"@id": n["@id"]} if "@id" in n else n
+            break
+    varsa = {n.get("@id") for n in semalar if isinstance(n, dict)}
+    on = [sayfa] if SITE + "/#site" in varsa else [sayfa, web_site_sema()]
+    semalar = on + [n for n in semalar if n]
+
+    def temiz(x):
+        """null alanları grafikten düşür — geçersiz değil ama gürültü."""
+        if isinstance(x, dict):
+            return {a: temiz(v) for a, v in x.items() if v is not None}
+        if isinstance(x, list):
+            return [temiz(v) for v in x if v is not None]
+        return x
+
     sema_json = json.dumps(
-        {"@context": "https://schema.org", "@graph": semalar},
+        {"@context": "https://schema.org", "@graph": temiz(semalar)},
         ensure_ascii=False, separators=(",", ":"))
+
+    on_yukle = ""
+    if lcp_gorsel:
+        t = turevler(lcp_gorsel)
+        if t:
+            on_yukle = (f'\n<link rel="preload" as="image" href="/images/{lcp_gorsel}"'
+                        f' imagesrcset="{t}" imagesizes="(max-width:900px) 92vw, 46vw"'
+                        f' fetchpriority="high">')
+
     return f"""<!doctype html>
 <html lang="tr">
 <head>
@@ -370,8 +514,13 @@ def iskelet(*, slug, baslik, aciklama, govde, semalar, kirinti_html="", og_gorse
 <title>{k(baslik)}</title>
 <meta name="description" content="{k(aciklama)}">
 <link rel="canonical" href="{url}">
-<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
-<meta name="theme-color" content="#0B1F33">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<meta name="author" content="{k(I['ad'])}">
+<meta name="theme-color" content="#0E2436">
+<meta name="geo.region" content="TR-72">
+<meta name="geo.placename" content="Batman">
+<meta name="geo.position" content="{I['lat']};{I['lng']}">
+<meta name="ICBM" content="{I['lat']}, {I['lng']}">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="tr_TR">
 <meta property="og:site_name" content="{k(I['ad'])}">
@@ -379,12 +528,20 @@ def iskelet(*, slug, baslik, aciklama, govde, semalar, kirinti_html="", og_gorse
 <meta property="og:description" content="{k(aciklama)}">
 <meta property="og:url" content="{url}">
 <meta property="og:image" content="{SITE}/images/{og}">
+<meta property="og:image:width" content="{og_boy[0]}">
+<meta property="og:image:height" content="{og_boy[1]}">
+<meta property="og:image:alt" content="{k(baslik)}">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="preconnect" href="{SITE}">
-<link rel="preload" href="/assets/fonts/pjs-var-tr.woff2" as="font" type="font/woff2" crossorigin>
+<meta name="twitter:title" content="{k(baslik)}">
+<meta name="twitter:description" content="{k(aciklama)}">
+<meta name="twitter:image" content="{SITE}/images/{og}">
+<link rel="preload" href="/assets/fonts/pjs-var-tr.woff2" as="font" type="font/woff2" crossorigin>{on_yukle}
 <link rel="icon" href="/favicon-48.png" sizes="48x48" type="image/png">
 <link rel="icon" href="/favicon-96.png" sizes="96x96" type="image/png">
+<link rel="icon" href="/favicon-512.png" sizes="512x512" type="image/png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="stylesheet" href="/assets/style.css{damga('assets/style.css')}">
 <script>document.documentElement.className+=' js'</script>
 <script type="application/ld+json">{sema_json}</script>
@@ -392,9 +549,10 @@ def iskelet(*, slug, baslik, aciklama, govde, semalar, kirinti_html="", og_gorse
 <body>
 {ust_bar()}
 {kirinti_html}
-<main>
+<main id="icerik">
 {govde}
 </main>
+{yuzen_iletisim()}
 {alt_bilgi()}
 <script src="/assets/app.js{damga('assets/app.js')}" defer></script>
 </body>

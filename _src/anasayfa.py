@@ -4,7 +4,7 @@
 import data as D
 import arizalar as A
 from build import (IKON, resim, video_kapak, sss_blok, faq_sema,
-                   yerel_isletme_sema, k, SITE, I)
+                   yerel_isletme_sema, k, SITE, I, WA_LINK)
 from sayfalar import belge_blok
 
 CIHAZ_GORSEL = {
@@ -134,42 +134,103 @@ SSS = [
 ]
 
 
+# Galeri — gerçek saha fotoğrafları. Etiketler görselin İÇERİĞİNİ anlatır.
+GALERI = [
+ ("buzdolabi-motor-degisim.webp", "Buzdolabı kompresör (motor) değişimi"),
+ ("camasir-makinesi-motor-degisimi.webp", "Çamaşır makinesi motor değişimi"),
+ ("bulasik-makinesi-pervane-degisimi.webp", "Bulaşık makinesi pervane değişimi"),
+ ("buzmatik-ariza-tespit.webp", "Buzmatik arıza tespiti"),
+ ("buzdolabi-termostat-degisimi.webp", "Buzdolabı termostat değişimi"),
+ ("camasir-makinesi-conta-degisimi.webp", "Çamaşır makinesi conta değişimi"),
+ ("su-bosaltma-motoru-degisimi.webp", "Çamaşır makinesi su boşaltma motoru değişimi"),
+ ("buzdolabi-fan-degisim.webp", "Buzdolabı fan değişimi"),
+ ("bulasik-makinesi-kapi-kilidi-arizasi.webp", "Bulaşık makinesi kapı kilidi arızası"),
+ ("camasir-makinesi-deterjan-kutusu-degisimi.webp", "Çamaşır makinesi deterjan kutusu değişimi"),
+ ("buzdolabi-mentese-degisimi.webp", "Buzdolabı menteşe değişimi"),
+ ("bulasik-makinesi-sepet-degisimi.webp", "Bulaşık makinesi sepet değişimi"),
+]
+
+
+def _galeri():
+    p = []
+    for ad, etiket in GALERI:
+        g = resim(ad, etiket + " — Batman beyaz eşya servisi", boy="(max-width:980px) 46vw, 23vw")
+        if "eksik görsel" in g:
+            continue
+        p.append(f"<figure>{g}<figcaption>{k(etiket)}</figcaption></figure>")
+    return "".join(p)
+
+
 def govde():
     b = []
 
     # ---------------------------------------------------------- kahraman
     b.append(f"""<section class="kahraman"><div class="kap"><div class="kh-izgara">
 <div>
+<span class="kh-etiket">7/24 Acil Müdahale &amp; Yerinde Servis</span>
 <h1>Batman Beyaz Eşya Servisi — <em>Hızlı ve Güvenilir Teknik Servis</em></h1>
 <p class="kh-alt">Buzdolabı, çamaşır makinesi, bulaşık makinesi ve derin dondurucu arızalarında
 Batman merkezde <strong>genellikle 2 saat içinde</strong> adresinizdeyiz. Onarımların büyük
 çoğunluğunu evinizde tamamlıyor, taktığımız parçalara 1 yıl garanti veriyoruz.</p>
 <div class="kh-dgler">
 <a class="dg dg-ara" href="tel:{I['tel_link']}">{IKON['tel']}{I['tel_yazi']}</a>
-<a class="dg dg-wa" href="https://wa.me/{I['wa']}" rel="noopener" target="_blank">{IKON['wa']}WhatsApp'tan yaz</a>
+<a class="dg dg-wa" href="{WA_LINK}" rel="noopener" target="_blank">{IKON['wa']}WhatsApp'tan yaz</a>
+<a class="dg dg-bos" href="#cihazlar">Hizmetlerimiz</a>
 </div>
-<div class="kh-rozet">
-<span class="rozet">{IKON['saat']}Aynı gün yerinde servis</span>
-<span class="rozet">{IKON['kalkan']}Parçalara 1 yıl garanti</span>
-<span class="rozet">{IKON['araba']}Batman merkez ve tüm ilçeler</span>
-<span class="rozet">{IKON['arti']}8 yılı aşkın tecrübe</span>
-<span class="rozet">{IKON['saat']}7 gün 24 saat</span>
+<div class="kh-sayac">
+<div><b>8+</b><span>Yıl Tecrübe</span></div>
+<div><b>7/24</b><span>Acil Servis</span></div>
+<div><b>1 Yıl</b><span>Parça Garantisi</span></div>
 </div>
 </div>
 <div class="kh-gorsel">
-{resim("batman-beyaz-esya-servisi-nasil-calisir.webp",
-       "Batman beyaz eşya servisi teknisyeni cihaz onarırken",
-       boy="(max-width:900px) 92vw, 440px", oncelik=True)}
-<div class="kh-kart"><b>2 saat</b><span>Batman merkezde ortalama varış süresi</span></div>
+{resim("batman-beyaz-esya-servisi-hero.webp",
+       "Batman Beyaz Eşya Servisi — buzdolabı, çamaşır makinesi, bulaşık makinesi ve "
+       "derin dondurucu onarımı, aynı gün yerinde servis",
+       boy="(max-width:900px) 92vw, 560px", oncelik=True)}
 </div>
 </div></div></section>""")
 
     # ---------------------------------------------------------- şerit
     b.append(f"""<div class="serit"><div class="kap serit-ic">
 <span>{IKON['pin']}Fatih Mah. 3206. Sk. No:12, Batman Merkez</span>
-<span>{IKON['saat']}Buzdolabı çağrıları önce</span>
+<span>{IKON['kar']}Buzdolabı çağrıları önce</span>
 <span>{IKON['kalkan']}Önce fiyat, sonra işlem</span>
+<span>{IKON['saat']}Merkez ve ilçelerde 600 TL servis ücreti</span>
 </div></div>""")
+
+    # ---------------------------------------------------------- sayaç + neden biz
+    b.append(f"""<section class="alt"><div class="kap">
+<div class="sayac">
+<div><b>8+</b><span>Yıl Saha Tecrübesi</span></div>
+<div><b>2 Saat</b><span>Merkezde Ortalama Varış</span></div>
+<div><b>4 Cihaz</b><span>Uzmanlık Alanı</span></div>
+<div class="koyu"><b>7/24</b><span>Acil Servis</span></div>
+</div>
+<div class="izgara iz-2" style="margin-top:clamp(40px,5vw,64px);align-items:center;gap:clamp(28px,4vw,56px)">
+<div>
+<div class="bas sol"><span class="etiket">Neden biz?</span>
+<h2>Önce Teşhis, <span class="vurgu">Sonra Fiyat</span></h2>
+<p>Cihazınıza dokunmadan önce arızanın ne olduğunu ve ne tutacağını söylüyoruz.
+Onarımı istemezseniz yalnızca servis ücretini ödersiniz — sürpriz kalem çıkmaz.</p></div>
+<p><a class="dg dg-ara" href="tel:{I['tel_link']}">{IKON['tel']}{I['tel_yazi']}</a></p>
+</div>
+<div class="num-liste">
+<div class="num-satir"><b class="no">01</b><div><h3>Arızayı yerinde tespit ediyoruz</h3>
+<p>Telefonda dinlediğimiz belirtiye göre olası parçayı yanımızda getiriyor, tespiti adreste
+yapıyoruz. Tek ziyarette bitirmek için çalışıyoruz.</p></div></div>
+<div class="num-satir"><b class="no">02</b><div><h3>Maliyeti işleme başlamadan söylüyoruz</h3>
+<p>Masraf cihazın değerine yaklaşıyorsa bunu da açıkça belirtiyor, gerektiğinde onarım
+yaptırmamanızı kendimiz öneriyoruz.</p></div></div>
+<div class="num-satir"><b class="no">03</b><div><h3>Parçaya 1 yıl garanti veriyoruz</h3>
+<p>Taktığımız her parça bir yıl garantilidir. Onarımı bize yaptırırsanız çağrı ücretinde
+indirim uygulanır.</p></div></div>
+<div class="num-satir"><b class="no">04</b><div><h3>Soğutma sistemlerinde belgeliyiz</h3>
+<p>T.C. Millî Eğitim Bakanlığı İş Yeri Açma Belgemizin meslek dalı Soğutma Sistemleri —
+buzdolabı ve derin dondurucu çağrılarını bu yüzden sıranın önüne alıyoruz.</p></div></div>
+</div>
+</div>
+</div></section>""")
 
     # ---------------------------------------------------------- H2: Nedir?
     b.append(f"""<section id="hakkinda"><div class="kap">
@@ -405,6 +466,25 @@ bağımsız bir servise yaptıracağınız müdahale garantinizi düşürebilir.
 {belge_blok()}
 </div></section>""")
 
+    # ---------------------------------------------------------- galeri
+    b.append(f"""<section><div class="kap">
+<div class="serit-cta">
+<div><h2>7/24 Acil Beyaz Eşya Servisi</h2>
+<p>Buzdolabı ve derin dondurucu çağrıları sıranın önüne alınır — tatil ve pazar dahil.</p></div>
+<div class="dgler">
+<a class="dg dg-ara" href="tel:{I['tel_link']}">{IKON['tel']}{I['tel_yazi']}</a>
+<a class="dg dg-wa" href="{WA_LINK}" rel="noopener" target="_blank">{IKON['wa']}WhatsApp</a>
+</div>
+</div>
+</div></section>
+
+<section id="galeri" class="alt"><div class="kap">
+<div class="bas"><span class="etiket">Sahadan görüntüler</span>
+<h2>Çalışma <span class="vurgu">Galerimiz</span></h2>
+<p>Aşağıdaki kareler stok görsel değil — Batman'da kendi yaptığımız onarımlardan.</p></div>
+<div class="galeri">{_galeri()}</div>
+</div></section>""")
+
     # ---------------------------------------------------------- H2: Bilinmesi gerekenler + video
     v1 = video_kapak("beyaz-esya-servisi.mp4", "batman-beyaz-esya-servisi-nasil-calisir.webp",
                      "Sahada çalışırken", dikey=True)
@@ -444,7 +524,7 @@ edilen filtre, zamanla pompa arızasına kadar gidiyor. Bu, hiçbir masrafı olm
 adresinizdeyiz. Buzdolabı ve derin dondurucu çağrılarını sıranın önüne alıyoruz.</p>
 <div class="cta-dgler">
 <a class="dg dg-ara" href="tel:{I['tel_link']}">{IKON['tel']}{I['tel_yazi']}</a>
-<a class="dg dg-wa" href="https://wa.me/{I['wa']}" rel="noopener" target="_blank">{IKON['wa']}WhatsApp'tan yaz</a>
+<a class="dg dg-wa" href="{WA_LINK}" rel="noopener" target="_blank">{IKON['wa']}WhatsApp'tan yaz</a>
 </div>
 </div>
 <div class="izgara iz-3" style="margin-top:34px">

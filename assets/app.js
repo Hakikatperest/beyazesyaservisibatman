@@ -14,6 +14,13 @@ document.querySelectorAll('.video-kutu').forEach(function(kutu){
   kutu.innerHTML='';kutu.appendChild(v);
  });
 });
+// alt bilgi görünürken yüzen kart çekilsin — footer linklerini örtmesin
+var yz=document.querySelector('.yuzen'),ab=document.querySelector('.alt-bilgi');
+if(yz&&ab&&'IntersectionObserver'in window){
+ new IntersectionObserver(function(ls){
+  yz.classList.toggle('gizli',ls[0].isIntersecting);
+ },{threshold:0}).observe(ab);
+}
 // ortaya çıkış — uzun bloklara verilmiyor
 if('IntersectionObserver'in window){
  var g=new IntersectionObserver(function(ls){ls.forEach(function(l){

@@ -1,0 +1,29 @@
+{
+ "name": "Batman Beyaz Eşya Servisi",
+ "short_name": "Batman Beyaz Eşya",
+ "description": "Batman beyaz eşya teknik servisi — buzdolabı, çamaşır makinesi, bulaşık makinesi ve derin dondurucu onarımı.",
+ "start_url": "/",
+ "scope": "/",
+ "display": "standalone",
+ "background_color": "#FFFFFF",
+ "theme_color": "#0E2436",
+ "lang": "tr-TR",
+ "icons": [
+  {
+   "src": "/favicon-96.png",
+   "sizes": "96x96",
+   "type": "image/png"
+  },
+  {
+   "src": "/favicon-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  },
+  {
+   "src": "/favicon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}

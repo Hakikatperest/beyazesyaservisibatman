@@ -3,12 +3,15 @@
 
 Hata bulursa 1 döner. Commit'ten ÖNCE çalıştır.
 Kontroller: kırık iç link · eksik görsel/video · yinelenen title/description ·
-geçersiz JSON-LD · H1 sayısı · sayfa ağırlığı · dış kaynak · yetim sayfa.
+geçersiz JSON-LD · H1 sayısı · sayfa ağırlığı · dış kaynak · yetim sayfa ·
+canonical doğruluğu · title/description uzunluğu · alt metni · OG/Twitter ·
+sitemap kapsaması ve lastmod · şema düğüm bütünlüğü.
 """
 import os, re, sys, json, gzip
 from collections import defaultdict
 
 KOK = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SITE = "https://beyazesyaservisibatman.com"
 DIS_BEYAZ_LISTE = {"www.web4medya.com", "wa.me", "www.google.com",
                    "beyazesyaservisibatman.com"}
 AGIRLIK_SINIRI = 260_000      # gzip'siz HTML
@@ -62,12 +65,60 @@ def main():
         if len(h1) != 1:
             hatalar.append(f"{url} H1 sayısı {len(h1)} (1 olmalı)")
 
+        # canonical gerçekten bu sayfayı mı gösteriyor?
+        c = re.search(r'<link rel="canonical" href="([^"]+)"', s)
+        if c:
+            bekle = SITE + url
+            if c.group(1) != bekle:
+                hatalar.append(f"{url} canonical yanlış: {c.group(1)} (beklenen {bekle})")
+
+        # title uzunluğu — SERP'te ~60 karakterde kesiliyor
+        if t:
+            tv = t.group(1).strip()
+            if len(tv) > 70:
+                uyarilar.append(f"{url} title uzun ({len(tv)} kr)")
+            if len(tv) < 20:
+                hatalar.append(f"{url} title çok kısa ({len(tv)} kr)")
+        if dsc and len(dsc.group(1).strip()) < 70:
+            uyarilar.append(f"{url} description kısa ({len(dsc.group(1).strip())} kr)")
+
+        # görsellerde alt metni
+        for etiket in re.findall(r"<img[^>]*>", s):
+            al = re.search(r'alt="([^"]*)"', etiket)
+            if al is None:
+                hatalar.append(f"{url} alt ÖZNİTELİĞİ olmayan <img>")
+            elif not al.group(1).strip():
+                uyarilar.append(f"{url} boş alt metni")
+            if 'width=' not in etiket or 'height=' not in etiket:
+                uyarilar.append(f"{url} ölçüsüz <img> (CLS riski)")
+
+        # sosyal etiketler
+        for etiket in ("og:title", "og:description", "og:image", "og:url", "twitter:card"):
+            if f'"{etiket}"' not in s:
+                hatalar.append(f"{url} {etiket} yok")
+
         m = re.search(r'<script type="application/ld\+json">(.*?)</script>', s, re.S)
         if not m:
             hatalar.append(f"{url} JSON-LD yok")
         else:
             try:
-                json.loads(m.group(1))
+                g = json.loads(m.group(1))["@graph"]
+                tipler = set()
+                for n in g:
+                    tp = n.get("@type")
+                    tipler.update(tp if isinstance(tp, list) else [tp])
+                if "WebPage" not in tipler:
+                    hatalar.append(f"{url} WebPage düğümü yok")
+                if "LocalBusiness" not in tipler:
+                    hatalar.append(f"{url} LocalBusiness düğümü yok")
+                if url != "/" and "BreadcrumbList" not in tipler:
+                    hatalar.append(f"{url} BreadcrumbList yok")
+                for n in g:
+                    if n.get("@type") == "VideoObject":
+                        for alan in ("name", "description", "thumbnailUrl",
+                                     "contentUrl", "uploadDate"):
+                            if not n.get(alan):
+                                hatalar.append(f"{url} VideoObject eksik alan: {alan}")
             except Exception as e:
                 hatalar.append(f"{url} JSON-LD geçersiz: {e}")
 
@@ -77,7 +128,8 @@ def main():
         # iç linkler
         for href in re.findall(r'href="(/[^"#?]*)"', s):
             if href.startswith(("/assets/", "/images/", "/video/")) or href.endswith(
-                    (".png", ".webp", ".xml", ".txt", ".pdf", ".mp4", ".woff2")):
+                    (".png", ".webp", ".xml", ".txt", ".pdf", ".mp4", ".woff2",
+                     ".webmanifest", ".ico", ".svg", ".json", ".html")):
                 hedef = os.path.join(KOK, href.lstrip("/"))
                 if not os.path.exists(hedef):
                     hatalar.append(f"{url} → eksik dosya {href}")
@@ -111,6 +163,33 @@ def main():
     for a, u in aciklamalar.items():
         if len(u) > 1:
             hatalar.append(f"YİNELENEN description → {u}")
+
+    # --- site haritası: her sayfa var mı, lastmod düşmüş mü, fazlalık var mı
+    sm_yol = os.path.join(KOK, "sitemap.xml")
+    if not os.path.exists(sm_yol):
+        hatalar.append("sitemap.xml YOK")
+    else:
+        sm = open(sm_yol, encoding="utf-8").read()
+        loclar = set(re.findall(r"<loc>([^<]+)</loc>", sm))
+        for u in url_kume:
+            if SITE + u not in loclar:
+                hatalar.append(f"sitemap'te eksik: {u}")
+        for l in loclar:
+            if l.replace(SITE, "") not in url_kume:
+                hatalar.append(f"sitemap'te olmayan sayfa: {l}")
+        if sm.count("<lastmod>") != len(loclar):
+            hatalar.append("sitemap: her URL'de lastmod yok")
+        if "sitemap-image" not in sm:
+            uyarilar.append("sitemap: görsel eklentisi yok")
+        if "sitemap-video" not in sm:
+            uyarilar.append("sitemap: video eklentisi yok")
+
+    for gerekli in ("robots.txt", "404.html", "site.webmanifest", "CNAME", ".nojekyll"):
+        if not os.path.exists(os.path.join(KOK, gerekli)):
+            hatalar.append(f"kök dosya eksik: {gerekli}")
+    rb = os.path.join(KOK, "robots.txt")
+    if os.path.exists(rb) and "Sitemap:" not in open(rb, encoding="utf-8").read():
+        hatalar.append("robots.txt içinde Sitemap satırı yok")
 
     # yetim sayfa (ana sayfa hariç iç linki olmayan)
     for u in url_kume:

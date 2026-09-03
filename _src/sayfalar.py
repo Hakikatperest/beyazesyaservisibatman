@@ -7,18 +7,34 @@
 import data as D
 import arizalar as A
 from build import (IKON, resim, video_kapak, sss_blok, faq_sema, yerel_isletme_sema, k, SITE, I,
-                   bulunma, ayrilma, yonelme)
+                   bulunma, ayrilma, yonelme, WA_LINK)
 
 # --------------------------------------------------------------- ortak parçalar
+
+ONE_CIKAN = [
+    ("simsek", "Aynı gün servis", "Merkezde genellikle 2 saat içinde adresinizdeyiz."),
+    ("kar", "Buzdolabı önceliği", "Dolap ve derin dondurucu çağrıları sıranın önüne alınır."),
+    ("kalkan", "1 yıl parça garantisi", "Taktığımız her parça bir yıl garantilidir."),
+    ("belge", "Belgeli teknik servis", "Meslek dalı: Soğutma Sistemleri (MEB belgesi)."),
+]
+
+
+def one_cikan_blok():
+    ic = "".join(f'<li><i>{IKON[ik]}</i><span><b>{k(bs)}</b><span>{k(ac)}</span></span></li>'
+                 for ik, bs, ac in ONE_CIKAN)
+    return f'<div class="yan-blok"><h3>Öne çıkan hizmetler</h3><ul class="yan-ik">{ic}</ul></div>'
+
 
 def yan_kutu(baslik_liste, ust_baslik="İlgili sayfalar"):
     liste = "".join(f'<li><a href="{u}">{k(a)}</a></li>' for a, u in baslik_liste)
     return f"""<aside class="yan-kutu">
-<h3>Hemen destek alın</h3>
-<a class="dg dg-ara" href="tel:{I['tel_link']}">{IKON['tel']}{I['tel_yazi']}</a>
-<a class="dg dg-wa" href="https://wa.me/{I['wa']}" rel="noopener" target="_blank">{IKON['wa']}WhatsApp</a>
-<h3 style="margin-top:22px">{k(ust_baslik)}</h3>
-<ul>{liste}</ul></aside>"""
+{one_cikan_blok()}
+<div class="yan-blok"><h3>{k(ust_baslik)}</h3><ul>{liste}</ul></div>
+<div class="yan-blok koyu"><h3>Hemen arayın</h3>
+<p>7/24 acil beyaz eşya servisi — tatil ve pazar dahil.</p>
+<a class="dg dg-ara" href="tel:{I['tel_link']}" style="background:#fff;color:var(--lacivert)">{IKON['tel']}{I['tel_yazi']}</a>
+<a class="dg dg-wa" href="{WA_LINK}" rel="noopener" target="_blank">{IKON['wa']}WhatsApp</a>
+</div></aside>"""
 
 
 def cta_kutu(nerede="Batman"):
@@ -449,11 +465,28 @@ doğrudan etkiliyor.</p>
 }
 
 
+# Kullanıcının 2026-09-03'te yüklediği sayfa afişleri (3:2, doğru telefon basılı).
+CIHAZ_HERO = {
+    "buzdolabi": "batman-buzdolabi-tamircisi-hero.webp",
+    "camasir-makinesi": "batman-camasir-makinesi-tamircisi.webp",
+    "bulasik-makinesi": "batman-bulasik-makinesi-tamircisi.webp",
+    "derin-dondurucu": "batman-derin-dondurucu-tamircisi.webp",
+}
+CIHAZ_HERO_ALT = {
+    "buzdolabi": "Batman buzdolabı tamircisi — aynı gün yerinde buzdolabı onarımı",
+    "camasir-makinesi": "Batman çamaşır makinesi tamircisi — aynı gün yerinde onarım",
+    "bulasik-makinesi": "Batman bulaşık makinesi tamircisi — aynı gün yerinde onarım",
+    "derin-dondurucu": "Batman derin dondurucu tamircisi — aynı gün yerinde onarım",
+}
+
+
 def cihaz_sayfasi(c):
     ilgili = [a for a in A.ARIZALAR if a["cihaz"] == c["slug"]]
     kartlar = "".join(
-        f'<a class="kart gel" href="/{a["slug"]}/"><h3>{k(a["soru"])}</h3>'
-        f'<p>{k(a["kisa"])}</p><span class="devam">Oku {IKON["okd"]}</span></a>'
+        f'<a class="yatay-kart gel" href="/{a["slug"]}/">'
+        f'<span class="gorsel">{resim(a["gorsel"], k(a["soru"]), boy="(max-width:520px) 92vw, 200px")}</span>'
+        f'<span class="govde"><h3>{k(a["soru"])}</h3>'
+        f'<p>{k(a["kisa"])}</p><span class="devam">Detaylı bilgi {IKON["okd"]}</span></span></a>'
         for a in ilgili)
     diger = [(x["baslik"], f"/batman-{x['slug']}-tamircisi/")
              for x in D.CIHAZLAR if x["slug"] != c["slug"]]
@@ -463,25 +496,23 @@ def cihaz_sayfasi(c):
              if c["ad"].split()[0].lower() in f[0].lower() or "Servis" in f[0]]
     fsatir = "".join(f"<tr><td>{k(a)}</td><td class='ucret'>{k(u)}</td>"
                      f"<td class='aciklama'>{k(x)}</td></tr>" for a, u, x in fiyat)
-    g, alt = {"buzdolabi": ("buzdolabi-motor-degisim2.webp", "Batman buzdolabı tamircisi"),
-              "camasir-makinesi": ("camasir-makinesi-motor-degisimi.webp", "Batman çamaşır makinesi tamircisi"),
-              "bulasik-makinesi": ("bulasik-makinesi-pervane-degisimi2.webp", "Batman bulaşık makinesi tamircisi"),
-              "derin-dondurucu": ("buzmatik-ariza-tespit-ve-tamir.webp", "Batman derin dondurucu tamircisi"),
-              }[c["slug"]]
+    g, alt = CIHAZ_HERO[c["slug"]], CIHAZ_HERO_ALT[c["slug"]]
 
     govde = f"""<section><div class="kap"><div class="yan">
 <div class="metin">
 <h1>{k(c['baslik'])}</h1>
-{resim(g, alt, boy="(max-width:980px) 92vw, 700px", oran="4/3")}
+{resim(g, alt, boy="(max-width:980px) 92vw, 700px", oncelik=True)}
 {CIHAZ_ICERIK[c['slug']]}
 </div>
 {yan_kutu(diger + bolge[:3], "Diğer cihazlar ve bölgeler")}
 </div></div></section>
 
 <section class="alt"><div class="kap">
-<div class="bas"><h2>{k(c['ad'])} arıza rehberi</h2>
+<div class="bas"><span class="etiket">Arıza rehberi</span>
+<h2>{k(c['ad'])} <span class="vurgu">Arıza Rehberi</span></h2>
 <p>Belirtinize en yakın başlığı seçin; sebebini, çözümünü ve yaklaşık maliyetini anlattık.</p></div>
-<div class="izgara iz-3">{kartlar}</div>
+<div class="kat-bas"><h2>{k(c['ad'])} Arızaları</h2><span>{len(ilgili)} rehber</span></div>
+<div class="izgara iz-2">{kartlar}</div>
 </div></section>
 
 <section><div class="kap">
