@@ -45,10 +45,11 @@ unicode-range:U+0000-00FF,U+0100-017F,U+011E-011F,U+0130-0131,U+015E-015F,U+2000
 
 def uret_anasayfa():
     kir, kir_sema = "", None
+    B.video_sifirla()
     govde = anasayfa.govde()
     html = B.iskelet(
         slug="", baslik=anasayfa.BASLIK, aciklama=anasayfa.ACIKLAMA,
-        govde=govde, semalar=anasayfa.semalar())
+        govde=govde, semalar=anasayfa.semalar() + B.video_semalari(""))
     return [("", B.yaz("", html))]
 
 
@@ -66,6 +67,7 @@ def uret_arizalar():
         digerleri = [x for x in A.ARIZALAR if x["cihaz"] == a["cihaz"] and x["slug"] != a["slug"]]
         yan_liste = "".join(f'<li><a href="/{x["slug"]}/">{B.k(x["soru"])}</a></li>'
                             for x in digerleri[:8])
+        B.video_sifirla()
         gorsel = B.resim(a["gorsel"], a["soru"] + " — Batman beyaz eşya servisi",
                          boy="(max-width:980px) 92vw, 700px", oran="4/3") if a.get("gorsel") else ""
         video = ""
@@ -104,7 +106,7 @@ işleme başlamadan söylüyoruz. Taktığımız parçalar <strong>1 yıl garant
              "publisher": {"@id": SITE + "/#isletme"},
              "mainEntityOfPage": SITE + "/" + a["slug"] + "/",
              "inLanguage": "tr-TR"},
-        ]
+        ] + B.video_semalari(a["slug"])
         html = B.iskelet(
             slug=a["slug"],
             baslik=f"{a['soru']} | Batman Beyaz Eşya Servisi",
@@ -119,16 +121,19 @@ def uret_cihazlar():
     for c in D.CIHAZLAR:
         slug = f"batman-{c['slug']}-tamircisi"
         kir, kir_sema = B.kirinti([("Ana Sayfa", "/"), (c["baslik"], None)])
+        B.video_sifirla()
+        govde = S.cihaz_sayfasi(c)
         semalar = [B.yerel_isletme_sema(), kir_sema,
                    {"@type": "Service", "serviceType": f"Batman {c['ad_tamlama']} tamiri",
                     "provider": {"@id": SITE + "/#isletme"},
                     "areaServed": [{"@type": "AdministrativeArea", "name": b["ad"]}
-                                   for b in D.BOLGELER]}]
+                                   for b in D.BOLGELER]},
+                   B.faq_sema(S.CIHAZ_SSS[c["slug"]])] + B.video_semalari(slug)
         html = B.iskelet(
             slug=slug, baslik=f"{c['baslik']} | Aynı Gün Yerinde Servis",
             aciklama=f"{c['baslik']}: {c['ozet']} Merkezde 2 saat içinde, "
                      f"1 yıl garanti. {I['tel_yazi']}",
-            govde=S.cihaz_sayfasi(c), semalar=semalar, kirinti_html=kir)
+            govde=govde, semalar=semalar, kirinti_html=kir)
         cikti.append((slug, B.yaz(slug, html)))
     return cikti
 
@@ -138,15 +143,18 @@ def uret_markalar():
     for m in D.MARKALAR:
         slug = f"batman-{m['slug']}-servisi"
         kir, kir_sema = B.kirinti([("Ana Sayfa", "/"), (f"Batman {m['ad']} Servisi", None)])
+        B.video_sifirla()
+        govde = S.marka_sayfasi(m)
         semalar = [B.yerel_isletme_sema(), kir_sema,
                    {"@type": "Service", "serviceType": f"Batman {m['ad']} beyaz eşya servisi",
                     "provider": {"@id": SITE + "/#isletme"},
-                    "brand": {"@type": "Brand", "name": m["ad"]}}]
+                    "brand": {"@type": "Brand", "name": m["ad"]}},
+                   B.faq_sema(S.marka_sss(m))] + B.video_semalari(slug)
         html = B.iskelet(
             slug=slug, baslik=f"Batman {m['ad']} Servisi | Beyaz Eşya Teknik Servisi",
             aciklama=f"Batman {m['ad']} servisi: buzdolabı, çamaşır ve bulaşık makinesi, derin "
                      f"dondurucu onarımı. Merkezde 2 saat içinde, 1 yıl garanti. {I['tel_yazi']}",
-            govde=S.marka_sayfasi(m), semalar=semalar, kirinti_html=kir)
+            govde=govde, semalar=semalar, kirinti_html=kir)
         cikti.append((slug, B.yaz(slug, html)))
     return cikti
 
@@ -157,15 +165,18 @@ def uret_bolgeler():
         slug = f"{b['slug']}-beyaz-esya-servisi"
         kir, kir_sema = B.kirinti([("Ana Sayfa", "/"),
                                    (f"{b['ad']} Beyaz Eşya Servisi", None)])
+        B.video_sifirla()
+        govde = S.bolge_sayfasi(b)
         semalar = [B.yerel_isletme_sema(), kir_sema,
                    {"@type": "Service", "serviceType": "Beyaz eşya teknik servisi",
                     "provider": {"@id": SITE + "/#isletme"},
-                    "areaServed": {"@type": "AdministrativeArea", "name": b["ad"]}}]
+                    "areaServed": {"@type": "AdministrativeArea", "name": b["ad"]}},
+                   B.faq_sema(S.bolge_sss(b))] + B.video_semalari(slug)
         html = B.iskelet(
             slug=slug, baslik=f"{b['ad']} Beyaz Eşya Servisi | Buzdolabı, Çamaşır ve Bulaşık Makinesi",
             aciklama=f"{b['ad']} beyaz eşya servisi: buzdolabı, çamaşır ve bulaşık makinesi, "
                      f"derin dondurucu onarımı. Varış {b['sure']}. {I['tel_yazi']}",
-            govde=S.bolge_sayfasi(b), semalar=semalar, kirinti_html=kir)
+            govde=govde, semalar=semalar, kirinti_html=kir)
         cikti.append((slug, B.yaz(slug, html)))
     return cikti
 

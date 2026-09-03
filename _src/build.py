@@ -5,7 +5,7 @@
 
 ⛔ Kök dizindeki HTML dosyalarını ELLE DÜZENLEME — bu betik hepsini yeniden yazar.
 """
-import os, re, json, html, hashlib, shutil, sys
+import os, re, json, html, hashlib, shutil, struct, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import data as D
@@ -89,12 +89,78 @@ def resim(ad, alt, sinif="", boy="100vw", oncelik=False, oran=None):
     )
 
 
-def video_kapak(video_ad, poster_ad, etiket, dikey=True):
+# --- video: kapak + VideoObject şeması --------------------------------------
+# Çekim tarihleri bilinmiyor; depoya yüklendikleri gün kullanılıyor (uydurma tarih YOK).
+VIDEO_TARIHI = "2026-09-03"
+
+# Sayfa üretilirken o sayfaya konan videolar burada birikir; iskelet çağrılmadan
+# önce video_semalari() ile alınır. uret.py her sayfadan önce video_sifirla() çağırır.
+_SAYFA_VIDEO = []
+
+
+def video_sifirla():
+    _SAYFA_VIDEO.clear()
+
+
+def mp4_sure(video_ad):
+    """MP4 mvhd atomundan süre (saniye). ffprobe yok, başlığın ilk 4 KB'ı yetiyor."""
+    yol = os.path.join(KOK, "video", video_ad)
+    try:
+        with open(yol, "rb") as f:
+            veri = f.read(4096)
+        i = veri.find(b"mvhd")
+        if i < 0:
+            return None
+        p = i + 4
+        surum = veri[p]
+        p += 4
+        if surum == 1:
+            p += 16
+            olcek = struct.unpack(">I", veri[p:p + 4])[0]; p += 4
+            sure = struct.unpack(">Q", veri[p:p + 8])[0]
+        else:
+            p += 8
+            olcek = struct.unpack(">I", veri[p:p + 4])[0]; p += 4
+            sure = struct.unpack(">I", veri[p:p + 4])[0]
+        return sure / olcek if olcek else None
+    except Exception:
+        return None
+
+
+def video_semalari(slug):
+    """O sayfaya yerleşen videoların VideoObject listesi."""
+    url = SITE + "/" + (slug + "/" if slug else "")
+    liste = []
+    for video_ad, poster, etiket, aciklama in _SAYFA_VIDEO:
+        s = {
+            "@type": "VideoObject",
+            "name": etiket + " — Batman Beyaz Eşya Servisi",
+            "description": aciklama,
+            "thumbnailUrl": SITE + poster,
+            "contentUrl": f"{SITE}/video/{video_ad}",
+            "uploadDate": VIDEO_TARIHI,
+            "inLanguage": "tr-TR",
+            "isFamilyFriendly": True,
+            "publisher": {"@id": SITE + "/#isletme"},
+            "contentLocation": {"@type": "Place", "name": "Batman"},
+            "mainEntityOfPage": url,
+        }
+        sn = mp4_sure(video_ad)
+        if sn:
+            s["duration"] = "PT%dS" % round(sn)
+        liste.append(s)
+    return liste
+
+
+def video_kapak(video_ad, poster_ad, etiket, dikey=True, aciklama=None):
     """Tıklanana kadar TEK BAYT inmeyen video kapağı. 84 MB video var — asla otomatik yükleme."""
     if not os.path.exists(os.path.join(KOK, "video", video_ad)):
         return f"<!-- eksik video: {video_ad} -->"
     poster = f"/images/w640/{poster_ad}" if os.path.exists(
         os.path.join(KOK, "images", "w640", poster_ad)) else f"/images/{poster_ad}"
+    _SAYFA_VIDEO.append((video_ad, poster, etiket,
+                         aciklama or (etiket + " — Batman'da kendi yaptığımız onarımdan "
+                                      "çekilmiş saha görüntüsü.")))
     return (
         f'<div class="video-kutu{" dikey" if dikey else ""}" data-video="/video/{video_ad}">'
         f'<img src="{poster}" alt="{k(etiket)}" loading="lazy" decoding="async" width="640" height="853">'

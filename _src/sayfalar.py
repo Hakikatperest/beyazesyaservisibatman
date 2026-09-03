@@ -51,6 +51,355 @@ hakları</strong> kapsıyor. Görselde kişisel bilgiler gizlilik gereği kapat�
 </div>"""
 
 
+# --------------------------------------------------------------- saha videoları
+# Hepsi Batman'da kendi yaptığımız onarımlardan. Kapak deseni: tıklanana kadar
+# tek bayt inmez. Etiketler videonun İÇERİĞİNİ anlatır — iddia değil.
+CIHAZ_VIDEO = {
+"buzdolabi": [
+ ("buzdolabi-koprosor-degisimi.mp4", "buzdolabi-motor-degisim3.webp",
+  "Buzdolabı kompresör (motor) değişimi"),
+ ("buzdolabi-kart-degisim2.mp4", "buzdolabi-kart-degisimi2.webp",
+  "Buzdolabı elektronik kart değişimi"),
+ ("buzdolabi-kacak-arizasi.mp4", "buzdolabi-motor-karti-degisimi.webp",
+  "Buzdolabında kaçak tespiti"),
+],
+"camasir-makinesi": [
+ ("camasir-makinesi-tamiri.mp4", "camasir-makinesi-motor-degisimi.webp",
+  "Çamaşır makinesi tamiri"),
+ ("camasir-makinesi-kazan-arizasi2.mp4", "arizali-camasir-makinesi.webp",
+  "Çamaşır makinesi kazan arızası"),
+ ("camasir-makinesi-sase-degisim.mp4", "camasir-makinesi-pas-temizligi.webp",
+  "Çamaşır makinesi şase değişimi"),
+ ("camasir-makinesi-cocuk-kilidi-arizasi.mp4", "camasir-makinesi-karti.webp",
+  "Çamaşır makinesi çocuk kilidi arızası"),
+],
+"bulasik-makinesi": [
+ ("bulasik-makinesi-svic-arizasi.mp4", "bulasik-makinesi-pervane-degisimi.webp",
+  "Bulaşık makinesi sviç arızası"),
+ ("bulasik-makinesi-su-kacak-tespiti.mp4", "bulasik-makinesi-ariza.webp",
+  "Bulaşık makinesinde su kaçağı tespiti"),
+ ("bulasik-makinesi-kart-degisim2.mp4", "bulasik-makinesi-kart-degisim-arizasi.webp",
+  "Bulaşık makinesi kart değişimi"),
+],
+"derin-dondurucu": [
+ ("derin-dondurucu-motor-arizasi.mp4", "buzmatik-ariza-tespit.webp",
+  "Derin dondurucu motor arızası"),
+ ("buzdolabi-koprosor-degisimi.mp4", "buzdolabi-motor-degisim.webp",
+  "Kompresör (motor) değişimi"),
+ ("buzdolabi-gaz-kacagi-govde-degisim.mp4", "buzdolabi-motor-karti-degisimi3.webp",
+  "Gaz kaçağında gövde onarımı"),
+],
+}
+
+BOLGE_VIDEO = {
+"batman-merkez": [
+ ("beyaz-esya-servisi.mp4", "batman-beyaz-esya-servisi-nasil-calisir.webp", "Sahada çalışırken"),
+ ("camasir-makinesi-servisi.mp4", "camasir-makinesi-motor-degisimi.webp", "Çamaşır makinesi servisi"),
+],
+"besiri": [
+ ("camasir-makinesi-tamir.mp4", "camasir-makinesi-karti.webp", "Çamaşır makinesi tamiri"),
+ ("buzdolabi-arka-fan-sesi.mp4", "buzdolabi-fan-degisim.webp", "Buzdolabı arka fan sesi"),
+],
+"gercus": [
+ ("arizali-camasir-makinesi-sesi.mp4", "arizali-camasir-makinesi.webp", "Arızalı çamaşır makinesi sesi"),
+ ("bulasik-makinesi-motor-ariza-sesi.mp4", "bulasik-makinesi-ariza.webp", "Bulaşık makinesi motor arıza sesi"),
+],
+"hasankeyf": [
+ ("camasir-makinesi-kazan-arizasi3.mp4", "motoru-arizali-camasir-makinesi.webp", "Çamaşır makinesi kazan arızası"),
+ ("buzdolabi-arka-hortum-gider-temizligi.mp4", "buzdolabi-mentese-degisimi.webp", "Buzdolabı arka gider temizliği"),
+],
+"kozluk": [
+ ("camasir-makinesi-kapi-kilit-arizasi.mp4", "camasir-makinesi-karti2.webp", "Çamaşır makinesi kapı kilidi arızası"),
+ ("camasir-makinesi-gider-hortumu-degisimi.mp4", "camasir-makinesi-conta-degisimi.webp", "Çamaşır makinesi gider hortumu değişimi"),
+],
+"sason": [
+ ("camasir-makinesi-su-bosaltma-motoru-arizasi.mp4", "su-bosaltma-motoru-degisimi3.webp",
+  "Çamaşır makinesi su boşaltma motoru arızası"),
+ ("bulasik-makinesi-su-kacak-tespiti.mp4", "bulasik-makinesi-sepet-degisimi.webp",
+  "Bulaşık makinesinde su kaçağı tespiti"),
+],
+}
+
+
+def saha_videolari(liste, baslik, giris, alt=True):
+    """Kapak desenli video şeridi. Dosya yoksa video_kapak sessizce yorum düşer."""
+    kutular = "".join(video_kapak(v, p, e) for v, p, e in liste)
+    if "video-kutu" not in kutular:
+        return ""
+    return f"""<section{' class="alt"' if alt else ''}><div class="kap">
+<div class="bas"><span class="etiket">Sahadan</span><h2>{k(baslik)}</h2>
+<p>{k(giris)} Videolar <strong>siz oynatana kadar yüklenmez</strong>, sayfayı yavaşlatmaz.</p></div>
+<div class="izgara iz-3">{kutular}</div>
+</div></section>"""
+
+
+def sss_bolumu(sorular, baslik, alt=False):
+    return f"""<section{' class="alt"' if alt else ''}><div class="kap">
+<div class="bas"><span class="etiket">Sık sorulanlar</span><h2>{k(baslik)}</h2></div>
+{sss_blok(sorular)}
+</div></section>"""
+
+
+# --------------------------------------------------------------- cihaz SSS
+# ⚠️ Tüm cevaplar _src/bilgi.md'deki işletme anlatımına dayanır. Yeni iddia YOK.
+CIHAZ_SSS = {
+"buzdolabi": [
+ ("Buzdolabım soğutmuyor, sebebi ne olabilir?",
+  "<p>İki ana sebep var: <strong>gazla ilgili bir sorun</strong> veya "
+  "<strong>kompresörün (halk arasında 'motor') çalışmaması.</strong> Motor kaynaklıysa sistem "
+  "açılır, kaynak yapılır, tıkanma giderilir, vakum çekilir ve gaz basılır.</p>"),
+ ("Buzdolabı ses yapıyor, ne olmuş olabilir?",
+  "<p>Neredeyse her zaman <strong>fan</strong> kaynaklıdır — buzdolabında ses çıkarabilecek "
+  "başka bir parça pek yoktur. Fan buza çarpıyor veya arka pervane sıkışmış olabilir. "
+  "Bazen <strong>buzmatik</strong> (buz yapma ünitesi) ses yapar.</p>"),
+ ("Buzdolabının altında su birikiyor, ne yapmalıyım?",
+  "<p>Buzlar çözüldükten sonra suyun aktığı <strong>arka gider tıkanmıştır.</strong> Gider "
+  "kapalıysa su ön taraftan da akabilir. Gider açılınca sorun biter; bu genelde parça "
+  "gerektirmeyen, yalnızca servis ücreti alınan bir iştir.</p>"),
+ ("Buzdolabı hiç durmadan çalışıyor, normal mi?",
+  "<p>Değil. <strong>Termostat arızalıdır</strong> ve kompresörü dinlendirmiyordur. "
+  "Termostat değişimi işçilikle beraber yaklaşık <strong>1.500 TL</strong>; parçası pahalı "
+  "modellerde 2.000 TL'ye kadar çıkabilir.</p>"),
+ ("Buzdolabında buzlanma neden olur?",
+  "<p><strong>Statik</strong> buzdolaplarında etraftan komple buzlanma normaldir. "
+  "<strong>No-frost</strong> modellerde buzlanma olasılığı düşüktür; buz görüyorsanız akla ilk "
+  "gelen, buzu eriten <strong>rezistansın çalışmamasıdır.</strong></p>"),
+ ("Kompresör (motor) değişimi ne kadar tutuyor?",
+  "<p><strong>8.000 – 11.000 TL</strong> aralığında. Fiyat gaz tipine, motor büyüklüğüne ve "
+  "dolabın litresine göre değişir. Kesin rakamı arıza yerinde tespit edildikten sonra, "
+  "işleme başlamadan önce söylüyoruz.</p>"),
+ ("Kompresör neden yanar?",
+  "<p>Dört sebebi var: <strong>tıkanma, fazla akım, fazla gaz ve gaz kaçağı.</strong> "
+  "Bu yüzden kompresör değiştirirken yalnızca motoru takıp geçmiyor, sistemin tamamına "
+  "bakıyoruz — sebep duruyorsa yeni motor da aynı yolu izler.</p>"),
+ ("Gaz kaçağı onarılır mı, yoksa dolabı değiştireyim mi?",
+  "<p>Kaçak <strong>gözle görünen bir yerdeyse</strong> kaynak edilir ve iş evinizde biter. "
+  "Kaçak görünmüyorsa <strong>dolabın arkasının kesilmesi</strong> gerekir; cihaz atölyeye "
+  "çekilir ve maliyet yaklaşık 5.000 TL'yi bulur. Bu durumda masraf çoğu zaman cihazın "
+  "değerine yaklaştığı için <strong>onarım yaptırmamanızı kendimiz öneriyoruz.</strong></p>"),
+ ("Kapak lastiği bozulduysa mutlaka değişmesi gerekir mi?",
+  "<p>Her zaman değil — kapak lastiği ısıtılınca gevşeyip eski formunu geri alabiliyor. "
+  "Ancak bunu kendi başınıza denemeyin: <strong>önce cihazın fişini çekin</strong> ve "
+  "yine de bize haber verin. Lastiğin kurtarılıp kurtarılamayacağına yerinde bakıp "
+  "söylüyoruz.</p>"),
+ ("Buzdolabı arızası ne kadar acil sayılıyor?",
+  "<p>Bizde en acil çağrı buzdolabıdır. <strong>Buzdolabı ve derin dondurucu çağrılarını "
+  "her zaman sıranın önüne alıyoruz</strong>, çünkü duran bir dolapta gıdanın tamamı bozulur. "
+  "Bu bizim kendi çalışma önceliğimizdir.</p>"),
+],
+"camasir-makinesi": [
+ ("Çamaşır makinesi su almıyor, sebebi ne?",
+  "<p>Arkadaki <strong>su ventili</strong> suyu iletmiyordur — makine su almadan çalışmaz. "
+  "Ventil sağlamsa <strong>kart ventile elektrik vermiyordur.</strong> Ventilin parçası "
+  "yaklaşık 400 TL, değişimiyle birlikte <strong>1.100 TL</strong> tutuyor.</p>"),
+ ("Çamaşır makinesi suyu boşaltmıyor?",
+  "<p>Genelde alt sağdaki <strong>pompa motoru</strong> kaynaklıdır; içindeki pervane suyu "
+  "çekmiyordur. En yaygın sebep <strong>para, çorap ve ceplerden çıkan atıkların</strong> "
+  "pompayı tıkamasıdır. Pompa değişimi parçayla birlikte yaklaşık "
+  "<strong>2.500 TL</strong>.</p>"),
+ ("Makine sıkma yapmıyor, neden?",
+  "<p>İki sebep var: <strong>motor kömürleri</strong> zayıflamıştır, ya da makine "
+  "<strong>suyu boşaltamadığı için</strong> sıkmaya hiç girmiyordur. Sıkma şikâyetiyle "
+  "gittiğimiz cihazlarda sorun çoğu zaman sıkmada değil, suyu boşaltamamaktadır.</p>"),
+ ("Çamaşır makinesi çok ses yapıyor ve sallanıyor?",
+  "<p>İki kökten gelir: <strong>kazan ve rulman</strong> bozulması, veya "
+  "<strong>amortisörler.</strong> Amortisörler dengesizse kazan dengesiz çalışır — "
+  "ses ve sallanma aynı sebebin iki görünümüdür.</p>"),
+ ("Makinenin altından su geliyor?",
+  "<p>İki noktaya bakıyoruz: <strong>körük lastiği</strong> ve "
+  "<strong>arka hortum bağlantıları.</strong> Kaçağın yerini bulmak için makinenin bir "
+  "program boyunca çalıştırılması gerekebiliyor.</p>"),
+ ("Çamaşırlarım kötü kokuyor, makineden mi?",
+  "<p>Makine <strong>suyu ısıtmıyorsa</strong> koku yapar; hep düşük sıcaklıkta çalışan makine "
+  "iyi temizleyemez. Sıcak su hem temizler hem kokuyu önler. "
+  "<strong>Yanık kokusu</strong> gelmesi ise ayrı bir durumdur: kazan körük lastiğine "
+  "sürtüyor olabilir.</p>"),
+ ("Makine deterjanı çekmiyor?",
+  "<p><strong>Su basıncı düşüktür.</strong> Sebep genelde <strong>ventil</strong> "
+  "veya <strong>kireçtir.</strong></p>"),
+ ("Çamaşırlar temiz çıkmıyor?",
+  "<p>Makine <strong>suyu ısıtmıyordur.</strong> Sıcak su olmadan deterjan işini görmez — "
+  "programı değiştirmek çözmüyorsa rezistansa bakılması gerekir.</p>"),
+ ("Kapı kilidi arızasında kilidi zorlayabilir miyim?",
+  "<p><strong>Zorlamayın.</strong> Sahadaki en önemli uyarımız bu: kapı kilidi arızası "
+  "<strong>çok sık kartı da patlatıyor.</strong> Kilit sıkıştığında zorlamak, kilit "
+  "değişimiyle bitecek bir işi kart değişimine kadar büyütebiliyor. Kapı açılmıyorsa "
+  "bize haber verin.</p>"),
+ ("Rezistans neden bozuluyor?",
+  "<p>Makine uzun süre çalıştıkça içinde <strong>kalıntı ve kireç</strong> birikir; bu da "
+  "rezistansı bozar. Sık değişen parçalardan biridir.</p>"),
+],
+"bulasik-makinesi": [
+ ("Bulaşık makinesi su almıyor?",
+  "<p><strong>Su ventili</strong> değişmelidir — çamaşır makinesindeki mantığın aynısı "
+  "geçerlidir.</p>"),
+ ("Bulaşık makinesi suyu boşaltmıyor?",
+  "<p><strong>Pompa motoru</strong> kaynaklıdır. İçine <strong>limon kabuğu</strong>, yemek "
+  "artığı ve pislik girer, pompayı tıkar.</p>"),
+ ("Bulaşık makinesi hiç çalışmıyor?",
+  "<p><strong>Kart arızası</strong> olabilir. Ayrıca makine suyu alamıyorsa veya "
+  "boşaltamıyorsa <strong>programa hiç girmez</strong> — yani \"çalışmıyor\" görünen "
+  "cihazın sorunu çoğu zaman su tarafındadır.</p>"),
+ ("Bulaşıklar kirli çıkıyor?",
+  "<p>Suyu püskürten dönen kollar — bizim deyişimizle <strong>pervane</strong>, teknik adıyla "
+  "<strong>fıskiye</strong> — tıkanmış veya dönmüyordur. Bunlar düzenli açılıp temizlenmesi "
+  "gereken parçalardır; değiştiğinde daha hızlı ve düzgün döner. Bazen sebep yanlış veya "
+  "az deterjandır.</p>"),
+ ("Bulaşık makinesi koku yapıyor?",
+  "<p>Nadir gelen bir şikâyet. Sebebi cihazın <strong>alt tarafındaki contadır</strong>; "
+  "uzun süre değişmezse koku yapar.</p>"),
+ ("Bulaşık makinesi su kaçırıyor, nereden?",
+  "<p>Cihazın içi baştan sona suyla çalışır; kaçak noktaları şunlardır: alttaki "
+  "<strong>dört yollu vanalar</strong>, <strong>conta araları</strong>, "
+  "<strong>su girişleri</strong> ve <strong>patlak pervane/fıskiye.</strong></p>"),
+ ("Makine aşırı köpürüyor?",
+  "<p>Sebep <strong>yanlış deterjan kullanımıdır.</strong> Bazı kullanıcılar \"daha iyi "
+  "temizlesin\" diye makineye farklı ürünler ekliyor; bu köpüğü artırıyor ve cihaza "
+  "zarar veriyor.</p>"),
+ ("Bulaşık makinesi kurutmuyor?",
+  "<p><strong>Pompa sistemdeki suyu boşaltmıyordur</strong> — yani pompa motoru "
+  "arızalıdır.</p>"),
+ ("Filtreyi ne sıklıkla temizlemeliyim?",
+  "<p><strong>3 ayda bir</strong> alttaki filtre açılıp temizlenmeli. İhmal edilince yıkama "
+  "verimi düşer; uzun vadede pompa arızasına kadar gidebiliyor. Hiçbir masrafı olmayan tek "
+  "bakım adımı budur.</p>"),
+ ("Rezistans arızası neden markaya göre farklı fiyatlanıyor?",
+  "<p>Yapı farkından. <strong>Bosch'ta rezistans motorun içindedir</strong> — arızalandığında "
+  "komple motor değişir, maliyet yükselir. <strong>Arçelik, Vestel ve diğer markalarda "
+  "rezistans motorun yanındadır</strong> — ayrı değişir, daha makul olur.</p>"),
+ ("Bulaşık makinesi parça değişimi ne kadar?",
+  "<p>Markaya göre değişmekle birlikte genelde <strong>1.000 – 2.000 TL</strong> civarında. "
+  "Kesin fiyatı yerinde tespitten sonra, işleme başlamadan önce söylüyoruz.</p>"),
+],
+"derin-dondurucu": [
+ ("Derin dondurucuda en sık hangi arızalar çıkıyor?",
+  "<p>Üç arıza öne çıkıyor: <strong>termostat</strong>, <strong>gaz kaçağı</strong> ve "
+  "<strong>kompresör (motor).</strong></p>"),
+ ("Derin dondurucu kompresör değişimi ne kadar?",
+  "<p><strong>8.000 – 10.000 TL</strong> aralığında. Fiyat cihazın litresine göre değişir; "
+  "400, 500, 600 ve 800 litre modellerde onarım yapıyoruz. Buzdolabına göre genelde biraz "
+  "daha düşük kalıyor.</p>"),
+ ("Derin dondurucu soğutmuyor, ne olmuş olabilir?",
+  "<p>Buzdolabındaki mantığın aynısı geçerli: ya <strong>gazla ilgili bir sorun</strong> "
+  "ya da <strong>kompresör</strong> çalışmıyordur. Motor kaynaklıysa sistem açılır, kaynak "
+  "yapılır, tıkanma giderilir, vakum çekilir ve gaz basılır.</p>"),
+ ("Derin dondurucu çağrısı öncelikli mi?",
+  "<p>Evet. Derin dondurucu ve buzdolabı çağrılarını <strong>her zaman sıranın önüne "
+  "alıyoruz</strong>, çünkü içindeki gıdanın tamamı bozulur. Bu bizim kendi çalışma "
+  "önceliğimizdir.</p>"),
+ ("Soğutma sistemlerinde belgeli misiniz?",
+  "<p>Evet. <strong>T.C. Millî Eğitim Bakanlığı İş Yeri Açma Belgesi</strong> sahibiyiz; "
+  "meslek alanı Tesisat Teknolojisi ve İklimlendirme, <strong>meslek dalı Soğutma "
+  "Sistemleri.</strong> Soğutma bizim asıl uzmanlık alanımız.</p>"),
+],
+}
+
+
+def marka_sss(m):
+    """Marka sayfası SSS'i — ortak gerçekler + markanın ailesine göre değişen madde."""
+    ad = m["ad"]
+    if m["aile"] == "bsh":
+        yapi = (f"<p>{ad} bulaşık makinelerinde <strong>rezistans (ısıtıcı) motorun "
+                f"içindedir.</strong> Arızalandığında ayrı değiştirilemez, "
+                f"<strong>komple motor değişir</strong> — bu da onarımı Arçelik veya Vestel gibi "
+                f"markalara göre belirgin şekilde pahalı hâle getirir. Bunu telefonda arızayı "
+                f"dinlediğimizde söylüyoruz ki sürprizle karşılaşmayın.</p>")
+    elif m["aile"] == "kore":
+        yapi = (f"<p>{ad} buzdolaplarında <strong>no-frost</strong> sistem yaygındır. No-frost "
+                f"modellerde buzlanma olasılığı düşüktür; buz görüyorsanız akla ilk gelen, buzu "
+                f"eriten <strong>rezistansın çalışmamasıdır.</strong> Bu markalarda elektronik "
+                f"kart ve fan kaynaklı arızalar da öne çıkıyor; kart arızasında motoru "
+                f"değiştirmeden önce <strong>kartın motora çıkış verip vermediğine</strong> "
+                f"bakıyoruz.</p>")
+    else:
+        yapi = (f"<p>{ad} bulaşık makinelerinde <strong>rezistans motorun yan tarafındadır.</strong> "
+                f"Arızalandığında motorun tamamı değil yalnızca rezistans değişir; bu da aynı "
+                f"arızanın Bosch, Siemens ve Profilo gibi markalara göre "
+                f"<strong>çok daha uygun</strong> çözülmesi demektir.</p>")
+    return [
+     (f"Batman'da {ad} servisi aynı gün geliyor mu?",
+      "<p>Batman merkezde arıza bildiriminden sonra <strong>genellikle 2 saat içinde</strong> "
+      "adreste oluyoruz. Beşiri, Gercüş, Hasankeyf, Kozluk ve Sason'a <strong>en geç 1 gün "
+      "içinde</strong> geliyoruz.</p>"),
+     (f"{ad} yetkili servisi misiniz?",
+      f"<p>Hayır, biz <strong>özel (bağımsız) teknik servisiz.</strong> Cihazınız garanti "
+      f"kapsamındaysa önce {ad} yetkili servisine gitmenizi kendimiz öneriyoruz — işlem ücretsiz "
+      f"olabilir ve bağımsız bir servise yaptıracağınız müdahale garantinizi düşürebilir. "
+      f"<strong>Garanti süresi dolmuşsa</strong> bize gelmeniz genellikle hem daha hızlı hem "
+      f"daha uygun oluyor.</p>"),
+     (f"{ad} cihazlarda dikkat ettiğiniz özel bir nokta var mı?", yapi),
+     (f"{ad} yedek parçası bulunuyor mu?",
+      "<p>Parça elimizde yoksa sipariş ediyor, <strong>1–2 gün içinde</strong> takılmasını "
+      "sağlıyoruz. Süreç boyunca sizi bilgilendiriyoruz.</p>"),
+     (f"{ad} onarımına garanti veriyor musunuz?",
+      "<p>Evet. Kullandığımız <strong>tüm parçalar 1 yıl garantilidir.</strong></p>"),
+     (f"Hangi {ad} cihazlarına bakıyorsunuz?",
+      f"<p>Dört cihaz grubunda çalışıyoruz: <strong>buzdolabı, çamaşır makinesi, bulaşık "
+      f"makinesi ve derin dondurucu.</strong> {ad} markasında da bu dört cihazın onarımını "
+      f"yapıyoruz.</p>"),
+     (f"{ad} onarımı evde mi yapılıyor?",
+      "<p>Onarımların <strong>büyük çoğunluğunu cihazı yerinden oynatmadan evinizde</strong> "
+      "tamamlıyoruz; parçayı orada takıyoruz. Atölyeye çekmek istisnai bir durumdur — en tipik "
+      "örneği buzdolabında gaz kaçağının gövde içinde olması ve arkanın kesilmesi gereken "
+      "hâllerdir.</p>"),
+     ("Servis ücreti ne kadar, onarım yaptırmazsam da alınıyor mu?",
+      "<p>Servis ücreti Batman merkezde <strong>600 TL</strong>, Batman köylerinde "
+      "<strong>1.000 TL</strong>'dir. Arızayı yerinde tespit edip maliyeti söylüyoruz; onarımı "
+      "yaptırmak istemezseniz yalnızca bu ücret alınır. <strong>Onarımı bize yaptırırsanız "
+      "çağrı ücretinde indirim uygulanır.</strong></p>"),
+    ]
+
+
+def bolge_sss(b):
+    """Bölge sayfası SSS'i — merkez ve ilçe için varış/ücret cevapları ayrışır."""
+    ad = b["ad"]
+    if b["merkez_mi"]:
+        varis = ("<p>Batman merkezde arıza bildiriminden sonra <strong>genellikle 2 saat "
+                 "içinde</strong> adreste oluyoruz; en kötü ihtimalle 2–3 saat. Servis genelde "
+                 "aynı ziyarette sonuçlanıyor.</p>")
+        ucret = ("<p>Batman merkez için servis ücretimiz <strong>600 TL</strong>, Batman'a bağlı "
+                 "<strong>köy adreslerinde 1.000 TL</strong>'dir. Bu ücret arızanın yerinde "
+                 "tespiti karşılığıdır; onarımı yaptırmak istemezseniz yalnızca bunu ödersiniz. "
+                 "<strong>Onarımı bize yaptırırsanız çağrı ücretinde indirim uygulanır.</strong></p>")
+        nerede = ("<p>Dükkânımız <strong>Fatih Mahallesi 3206. Sokak No:12, Batman Merkez</strong> "
+                  "adresinde. Cihazı getirmenize gerek yok; onarımların büyük çoğunluğunu "
+                  "evinizde tamamlıyoruz.</p>")
+    else:
+        varis = (f"<p>{ad} adreslerine varış süremiz <strong>en geç 1 gündür.</strong> Merkezdeki "
+                 f"gibi aynı saat içinde olmuyor, ama çağrınız sıraya alınır ve bir günü "
+                 f"geçmez.</p>")
+        ucret = (f"<p>{ad} için servis ücretini <strong>arızayı telefonda dinledikten sonra net "
+                 f"olarak söylüyoruz.</strong> Karşılaştırma olsun diye: Batman merkezde bu ücret "
+                 f"600 TL, Batman'a bağlı köylerde 1.000 TL'dir. Onarımı bize yaptırırsanız "
+                 f"çağrı ücretinde indirim uygulanır.</p>")
+        nerede = (f"<p>Dükkânımız Batman Merkez'de (Fatih Mahallesi 3206. Sokak No:12), ama "
+                  f"{ad} dahil tüm ilçelere gidiyoruz. Onarımların büyük çoğunluğunu cihazı "
+                  f"yerinden oynatmadan evinizde tamamlıyoruz.</p>")
+    return [
+     (f"{ad} bölgesine ne kadar sürede geliyorsunuz?", varis),
+     (f"{ad} için servis ücreti ne kadar?", ucret),
+     (f"{ad} dışında nerelere gidiyorsunuz?", nerede),
+     ("Telefonda arızayı nasıl anlatmalıyım?",
+      "<p>Cihazın <strong>markasını, modelini ve belirtiyi</strong> mümkün olduğunca ayrıntılı "
+      "anlatın. Mümkünse arızanın <strong>sesini veya görüntüsünü WhatsApp'tan gönderin</strong> "
+      "— tespiti oradan büyük ölçüde yapabiliyoruz. Bunu isteme sebebimiz, olası parçayı "
+      "önceden hazırlayıp tek ziyarette işi bitirmek.</p>"),
+     ("Hangi cihazları onarıyorsunuz?",
+      "<p>Dört cihaz grubunda çalışıyoruz: <strong>buzdolabı, çamaşır makinesi, bulaşık "
+      "makinesi ve derin dondurucu.</strong> Marka ayrımı yapmıyoruz.</p>"),
+     ("Aynı anda birden fazla çağrı olursa hangisi öne geçiyor?",
+      "<p><strong>Buzdolabı ve derin dondurucu.</strong> Bir çamaşır makinesi bir gün "
+      "bekleyebilir, ama duran bir buzdolabındaki gıdanın tamamı bozulur. Bu, sahada "
+      "uyguladığımız gerçek sıralamadır.</p>"),
+     ("Takılan parçalar garantili mi?",
+      "<p>Evet. Kullandığımız <strong>tüm parçalar 1 yıl garantilidir.</strong></p>"),
+     ("Onarım yaptırmazsam ne ödüyorum?",
+      "<p>Yalnızca <strong>servis (yol) ücretini.</strong> Arızayı tespit edip maliyeti "
+      "işleme başlamadan önce söylüyoruz; onarımı istemezseniz başka bir bedel çıkmaz. "
+      "Masraf cihazın değerine yaklaşıyorsa bunu da açıkça belirtiyoruz.</p>"),
+    ]
+
+
 # --------------------------------------------------------------- cihaz sayfaları
 
 CIHAZ_ICERIK = {
@@ -153,6 +502,15 @@ bildirilir. Onarımı yaptırırsanız çağrı ücretinde indirim uygulanır.</
         f'<p>Batman {k(m["ad"])} {k(c["ad_tamlama"])} servisi.</p></a>' for m in D.MARKALAR
     ) + """</div>
 </div></section>"""
+
+    govde += saha_videolari(
+        CIHAZ_VIDEO.get(c["slug"], []),
+        f"Batman'da yaptığımız {c['ad_tamlama']} onarımları",
+        "Aşağıdaki görüntüler stok video değil — Batman'da kendi yaptığımız onarımlardan.",
+        alt=False)
+    govde += sss_bolumu(CIHAZ_SSS[c["slug"]],
+                        f"Batman {c['ad_tamlama']} tamiri hakkında sık sorulan sorular",
+                        alt=True)
     return govde
 
 
@@ -245,7 +603,9 @@ takılmasını sağlıyoruz. Süreç boyunca sizi bilgilendiriyoruz. Taktığım
 <a class="devam" href="/#ariza-rehberi">Tüm arıza rehberi {IKON['okd']}</a></div></div>
 <div><div class="bas"><h2>Tamir ne kadar sürer?</h2></div>{sure_tablosu()}
 <p class="tbl-not">Onarımı bize yaptırırsanız çağrı ücretinde indirim uygulanır.</p></div>
-</div></div></section>"""
+</div></div></section>
+
+{sss_bolumu(marka_sss(m), f"Batman {m['ad']} servisi hakkında sık sorulan sorular", alt=True)}"""
 
 
 # --------------------------------------------------------------- bölge sayfaları
@@ -322,4 +682,8 @@ yaptırmak istemezseniz yalnızca bunu ödersiniz. <strong>Onarımı bize yaptı
 <div class="bas"><h2>Tamir ne kadar sürer?</h2>
 <p>{k(b['ad'])} adreslerinde de aynı süreler geçerli — fark yalnızca yola çıkma süresinde.</p></div>
 {sure_tablosu()}
-</div></section>"""
+</div></section>
+
+{saha_videolari(BOLGE_VIDEO.get(b['slug'], []), "Sahadan görüntüler",
+                "Aşağıdaki görüntüler stok video değil — Batman'da kendi yaptığımız onarımlardan.")}
+{sss_bolumu(bolge_sss(b), f"{b['ad']} beyaz eşya servisi hakkında sık sorulan sorular")}"""
