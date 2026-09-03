@@ -86,9 +86,11 @@ SSS = [
   "adreste oluyoruz; en geç aynı gün müdahale ediyoruz. İlçelerde (Beşiri, Gercüş, Hasankeyf, "
   "Kozluk, Sason) en geç 1 gün içinde geliyoruz.</p>"),
  ("Servis ücreti ne kadar, parça takılmazsa da alınıyor mu?",
-  "<p>Servis ücreti Batman merkezde <strong>600 TL</strong>, Batman köylerinde "
-  "<strong>1.000 TL</strong>'dir. Arızayı yerinde tespit edip maliyeti söylüyoruz; onarımı "
-  "yaptırmak istemezseniz yalnızca bu ücret alınır, başka bir bedel çıkmaz.</p>"),
+  "<p>Servis ücreti Batman merkezde ve <strong>ilçelerde 600 TL</strong>, Batman köylerinde "
+  "<strong>1.000 TL</strong>'dir. Beşiri, Gercüş, Hasankeyf, Kozluk ve Sason için "
+  "<strong>ayrıca yol ücreti almıyoruz.</strong> Arızayı yerinde tespit edip maliyeti "
+  "söylüyoruz; onarımı yaptırmak istemezseniz yalnızca bu ücret alınır, başka bir bedel "
+  "çıkmaz.</p>"),
  ("Onarım evde mi yapılıyor, cihaz götürülüyor mu?",
   "<p>Onarımların <strong>büyük çoğunluğunu cihazı yerinden oynatmadan evinizde</strong> "
   "tamamlıyoruz; parçayı orada takıyoruz. Cihazın atölyeye çekilmesi istisnai bir durumdur — "

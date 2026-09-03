@@ -72,6 +72,10 @@ CIHAZ_VIDEO = {
   "Çamaşır makinesi şase değişimi"),
  ("camasir-makinesi-cocuk-kilidi-arizasi.mp4", "camasir-makinesi-karti.webp",
   "Çamaşır makinesi çocuk kilidi arızası"),
+ # ⛔ Bu videonun dosya adında arıza kodu geçiyor; ETİKETTE geçmiyor —
+ #    "arıza kodları sayfaya girmeyecek" kararı bozulmasın.
+ ("camasir-makinesi-3e-arizasi.mp4", "camasir-makinesi-kart-degisimi-arizasi.webp",
+  "Çamaşır makinesi arıza tespiti"),
 ],
 "bulasik-makinesi": [
  ("bulasik-makinesi-svic-arizasi.mp4", "bulasik-makinesi-pervane-degisimi.webp",
@@ -343,8 +347,9 @@ def marka_sss(m):
       "örneği buzdolabında gaz kaçağının gövde içinde olması ve arkanın kesilmesi gereken "
       "hâllerdir.</p>"),
      ("Servis ücreti ne kadar, onarım yaptırmazsam da alınıyor mu?",
-      "<p>Servis ücreti Batman merkezde <strong>600 TL</strong>, Batman köylerinde "
-      "<strong>1.000 TL</strong>'dir. Arızayı yerinde tespit edip maliyeti söylüyoruz; onarımı "
+      "<p>Servis ücreti Batman merkezde ve ilçelerde <strong>600 TL</strong>, Batman köylerinde "
+      "<strong>1.000 TL</strong>'dir. İlçeler için ayrıca yol ücreti almıyoruz. "
+      "Arızayı yerinde tespit edip maliyeti söylüyoruz; onarımı "
       "yaptırmak istemezseniz yalnızca bu ücret alınır. <strong>Onarımı bize yaptırırsanız "
       "çağrı ücretinde indirim uygulanır.</strong></p>"),
     ]
@@ -357,8 +362,10 @@ def bolge_sss(b):
         varis = ("<p>Batman merkezde arıza bildiriminden sonra <strong>genellikle 2 saat "
                  "içinde</strong> adreste oluyoruz; en kötü ihtimalle 2–3 saat. Servis genelde "
                  "aynı ziyarette sonuçlanıyor.</p>")
-        ucret = ("<p>Batman merkez için servis ücretimiz <strong>600 TL</strong>, Batman'a bağlı "
-                 "<strong>köy adreslerinde 1.000 TL</strong>'dir. Bu ücret arızanın yerinde "
+        ucret = ("<p>Batman merkez için servis ücretimiz <strong>600 TL</strong>. Aynı ücret "
+                 "<strong>ilçelerde de geçerlidir</strong> — ilçe için ayrıca yol ücreti "
+                 "almıyoruz. Batman'a bağlı <strong>köy adreslerinde 1.000 TL</strong>'dir. "
+                 "Bu ücret arızanın yerinde "
                  "tespiti karşılığıdır; onarımı yaptırmak istemezseniz yalnızca bunu ödersiniz. "
                  "<strong>Onarımı bize yaptırırsanız çağrı ücretinde indirim uygulanır.</strong></p>")
         nerede = ("<p>Dükkânımız <strong>Fatih Mahallesi 3206. Sokak No:12, Batman Merkez</strong> "
@@ -368,10 +375,11 @@ def bolge_sss(b):
         varis = (f"<p>{ad} adreslerine varış süremiz <strong>en geç 1 gündür.</strong> Merkezdeki "
                  f"gibi aynı saat içinde olmuyor, ama çağrınız sıraya alınır ve bir günü "
                  f"geçmez.</p>")
-        ucret = (f"<p>{ad} için servis ücretini <strong>arızayı telefonda dinledikten sonra net "
-                 f"olarak söylüyoruz.</strong> Karşılaştırma olsun diye: Batman merkezde bu ücret "
-                 f"600 TL, Batman'a bağlı köylerde 1.000 TL'dir. Onarımı bize yaptırırsanız "
-                 f"çağrı ücretinde indirim uygulanır.</p>")
+        ucret = (f"<p><strong>600 TL</strong> — Batman merkezle aynı. {ad} ilçe olduğu için "
+                 f"<strong>ayrıca yol ya da mesafe ücreti almıyoruz.</strong> Bu ücret arızanın "
+                 f"yerinde tespiti karşılığıdır; onarımı yaptırmak istemezseniz yalnızca bunu "
+                 f"ödersiniz. <strong>Onarımı bize yaptırırsanız çağrı ücretinde indirim "
+                 f"uygulanır.</strong> (Batman'a bağlı köy adreslerinde ücret 1.000 TL'dir.)</p>")
         nerede = (f"<p>Dükkânımız Batman Merkez'de (Fatih Mahallesi 3206. Sokak No:12), ama "
                   f"{ad} dahil tüm ilçelere gidiyoruz. Onarımların büyük çoğunluğunu cihazı "
                   f"yerinden oynatmadan evinizde tamamlıyoruz.</p>")
@@ -645,8 +653,8 @@ def bolge_sayfasi(b):
         f'<p>{k(b["ad"])} {k(m["ad"])} beyaz eşya servisi.</p></a>' for m in D.MARKALAR)
     metin = BOLGE_NOT.get(b["slug"], BOLGE_NOT["varsayilan"]).format(
         ad=b["ad"], yon=yonelme(b["ad"]), ayr=ayrilma(b["ad"]), bul=bulunma(b["ad"]))
-    ucret_sat = ("<strong>600 TL</strong> (Batman merkez)" if b["merkez_mi"]
-                 else "arızayı dinledikten sonra telefonda net olarak söylüyoruz")
+    ucret_sat = ("<strong>600 TL</strong>" if b["merkez_mi"] else
+                 "<strong>600 TL</strong> — ilçe olduğu için ayrıca yol ücreti almıyoruz")
 
     return f"""<section><div class="kap"><div class="yan">
 <div class="metin">

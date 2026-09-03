@@ -35,11 +35,12 @@ ISLETME = {
     "yol_tarifi": "https://www.google.com/maps/dir/?api=1&destination=37.899098,41.140227",
 }
 
-# Servis/yol ücretleri — bölgeye göre (işletme 2026-09-03'te verdi)
+# Servis ücretleri — bölgeye göre (işletme 2026-09-03'te verdi)
+# ⚠️ İlçelere AYRI bir yol/mesafe ücreti YOK: ilçede de servis ücreti 600 TL.
 SERVIS_UCRETI = {
     "merkez": 600,
+    "ilce": 600,
     "koy": 1000,
-    "ilce": None,   # ⏳ işletmeden bekleniyor
 }
 
 # Tamir süreleri (işletme 2026-09-03'te teyit etti)
@@ -125,7 +126,7 @@ BOLGELER = [
         "kisa": "Beşiri",
         "sure": "en geç 1 gün içinde",
         "sure_kisa": "1 gün",
-        "ucret": None,
+        "ucret": 600,
         "merkez_mi": False,
     },
     {
@@ -134,7 +135,7 @@ BOLGELER = [
         "kisa": "Gercüş",
         "sure": "en geç 1 gün içinde",
         "sure_kisa": "1 gün",
-        "ucret": None,
+        "ucret": 600,
         "merkez_mi": False,
     },
     {
@@ -143,7 +144,7 @@ BOLGELER = [
         "kisa": "Hasankeyf",
         "sure": "en geç 1 gün içinde",
         "sure_kisa": "1 gün",
-        "ucret": None,
+        "ucret": 600,
         "merkez_mi": False,
     },
     {
@@ -152,7 +153,7 @@ BOLGELER = [
         "kisa": "Kozluk",
         "sure": "en geç 1 gün içinde",
         "sure_kisa": "1 gün",
-        "ucret": None,
+        "ucret": 600,
         "merkez_mi": False,
     },
     {
@@ -161,7 +162,7 @@ BOLGELER = [
         "kisa": "Sason",
         "sure": "en geç 1 gün içinde",
         "sure_kisa": "1 gün",
-        "ucret": None,
+        "ucret": 600,
         "merkez_mi": False,
     },
 ]
@@ -169,10 +170,11 @@ BOLGELER = [
 # ---------------------------------------------------------------- fiyatlar
 
 FIYATLAR = [
-    ("Servis / yol ücreti — Batman Merkez", "600 TL",
-     "Arızayı yerinde tespit ediyoruz. Onarımı yaptırmak istemezseniz yalnızca bu ücret alınır."),
-    ("Servis / yol ücreti — Batman köyleri", "1.000 TL",
-     "Merkez dışındaki köy adresleri için geçerlidir."),
+    ("Servis ücreti — Batman Merkez ve ilçeler", "600 TL",
+     "Beşiri, Gercüş, Hasankeyf, Kozluk ve Sason dahil. İlçe için ayrı yol ücreti alınmaz. "
+     "Arızayı yerinde tespit ediyoruz; onarımı yaptırmak istemezseniz yalnızca bu ücret alınır."),
+    ("Servis ücreti — Batman köyleri", "1.000 TL",
+     "Merkez ve ilçe dışındaki köy adresleri için geçerlidir."),
     ("Buzdolabı kompresör (motor) değişimi", "8.000 – 11.000 TL",
      "Gaz tipine, motor büyüklüğüne ve dolabın litresine göre değişir."),
     ("Derin dondurucu kompresör değişimi", "8.000 – 10.000 TL",

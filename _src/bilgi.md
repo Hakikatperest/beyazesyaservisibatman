@@ -15,6 +15,7 @@
 | Adres | Fatih Mah. 3206. Sk. No:12, 72070 Batman Merkez |
 | Koordinat | 37.899098, 41.140227 |
 | Tecrübe | 8+ yıl |
+| Çalışma saati | **7 gün 24 saat** — ✅ işletme 2026-09-03'te teyit etti |
 | Cihazlar | Buzdolabı · Çamaşır makinesi · Bulaşık makinesi · Derin dondurucu |
 
 **Bakılan markalar:** Arçelik, Bosch, Siemens, Vestel, Altus, Regal, Seg — ve marka ayrımı yapılmadan
@@ -28,7 +29,9 @@ diğer cihazlar.
 En kötü ihtimalle 2–3 saat. Servis genelde aynı ziyarette sonuçlanıyor.
 
 **İlçeler:** Beşiri, Gercüş, Hasankeyf, Kozluk, Sason — tamamına gidiliyor,
-**en geç 1 gün içinde**.
+**en geç 1 gün içinde**. Servis ücreti merkezle aynı: **600 TL, ayrıca yol ücreti alınmıyor.**
+
+**Çalışma saati:** 7 gün 24 saat; tatil ve pazar dahil (işletme 2026-09-03'te teyit etti).
 
 ### Öncelik sırası (işletmenin kendi kuralı — özgün açı)
 1. **Buzdolabı / derin dondurucu** — içindeki gıda bozulacağı için her zaman önce
@@ -49,9 +52,9 @@ En kötü ihtimalle 2–3 saat. Servis genelde aynı ziyarette sonuçlanıyor.
   kesilmesi gerekiyor.
 - **Kullanılan parçalara 1 (bir) yıl garanti veriliyor.**
 - Arıza tespit edilip müşteri onarımı istemezse **yalnızca servis ücreti** alınıyor.
-  ⚠️ **2026-09-03 güncellemesi:** servis ücreti bölgeye göre değişiyor — Merkez **600 TL**,
-  köyler **1.000 TL**. Önceki görüşmede geçen tek tip "800 TL" bu ayrımla GEÇERSİZ oldu,
-  sayfalarda 800 TL YAZILMAYACAK.
+  ⚠️ **2026-09-03 güncellemesi:** servis ücreti bölgeye göre değişiyor — Merkez **ve ilçeler
+  600 TL**, köyler **1.000 TL**. İlçelere ayrı yol ücreti YOK. Önceki görüşmede geçen tek tip
+  "800 TL" bu ayrımla GEÇERSİZ oldu, sayfalarda 800 TL YAZILMAYACAK.
 
 ---
 
@@ -62,9 +65,9 @@ En kötü ihtimalle 2–3 saat. Servis genelde aynı ziyarette sonuçlanıyor.
 
 | İş | Ücret |
 |---|---|
-| **Servis / yol ücreti — Batman Merkez** | **600 TL** |
-| **Servis / yol ücreti — Batman köyleri** | **1.000 TL** |
-| **Servis / yol ücreti — ilçeler** | `?` NETLEŞMEDİ (Beşiri, Gercüş, Hasankeyf, Kozluk, Sason) |
+| **Servis ücreti — Batman Merkez** | **600 TL** |
+| **Servis ücreti — ilçeler** | **600 TL** — ✅ 2026-09-03'te netleşti. İşletmenin ifadesi: *"ilçe servis yol ücreti yok, sadece servis ücreti 600 TL."* Yani ilçeye **ayrı yol/mesafe ücreti YOK.** (Beşiri, Gercüş, Hasankeyf, Kozluk, Sason) |
+| **Servis ücreti — Batman köyleri** | **1.000 TL** |
 | Buzdolabı kompresör (motor) değişimi | **8.000 – 11.000 TL** — gaza, motor büyüklüğüne, dolabın litresine göre |
 | Derin dondurucu kompresör değişimi | **8.000 – 10.000 TL** — 400/500/600/800 litreye göre değişir |
 | Buzdolabı gaz kaçağı (arka kesilerek) | **~5.000 TL** (≈3.000 TL parça + nakliye) |
