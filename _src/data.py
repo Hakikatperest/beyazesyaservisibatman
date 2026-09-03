@@ -112,6 +112,13 @@ MARKALAR = [
     {"slug": "lg",       "ad": "LG",       "aile": "kore",  "grup": "LG"},
 ]
 
+# Markaya özel saha notu — ⏳ İŞLETMEDEN BEKLENİYOR.
+# Doldurulan marka için sayfada ayrı bir bölüm açılır. ⛔ Buraya uydurma yazma;
+# yalnızca işletmenin kendi anlattığı, o markaya özgü gözlem girer.
+MARKA_NOT = {
+    # "vestel": "Vestel çamaşır makinelerinde en çok ... geliyor.",
+}
+
 # ---------------------------------------------------------------- bölgeler
 
 BOLGELER = [

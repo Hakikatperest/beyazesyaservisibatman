@@ -59,7 +59,26 @@ strong{font-weight:750}
   color:var(--mavi);background:var(--buz);border-radius:99px;padding:9px 20px;
   transition:background .18s,color .18s;
 }
-.h1-tel a::before{content:"";display:block}
+/* nabız halkası — dikkat çeksin (kullanıcı isteği). Hareket azaltma tercihine saygılı. */
+.h1-tel a{position:relative;animation:tel-nabiz 2.4s ease-in-out infinite}
+.h1-tel a::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;
+  box-shadow:0 0 0 0 rgba(11,95,165,.5);animation:tel-halka 2.4s ease-out infinite;pointer-events:none;
+}
+.h1-tel a svg{animation:tel-sallan 2.4s ease-in-out infinite;transform-origin:60% 60%}
+@keyframes tel-halka{
+  0%{box-shadow:0 0 0 0 rgba(11,95,165,.45)}
+  60%{box-shadow:0 0 0 16px rgba(11,95,165,0)}
+  100%{box-shadow:0 0 0 0 rgba(11,95,165,0)}
+}
+@keyframes tel-nabiz{0%,88%,100%{transform:scale(1)}92%{transform:scale(1.035)}96%{transform:scale(1)}}
+@keyframes tel-sallan{
+  0%,70%,100%{transform:rotate(0)}
+  74%{transform:rotate(-14deg)}78%{transform:rotate(12deg)}
+  82%{transform:rotate(-9deg)}86%{transform:rotate(6deg)}90%{transform:rotate(0)}
+}
+.h1-tel a:hover{animation-play-state:paused}
+.h1-tel a:hover::before,.h1-tel a:hover svg{animation-play-state:paused}
 .h1-tel a svg{width:20px;height:20px;fill:currentColor;flex:none}
 .h1-tel a:hover{text-decoration:none;background:var(--mavi);color:#fff}
 .h1-tel{display:flex;flex-direction:column;align-items:flex-start;gap:0}
@@ -388,6 +407,35 @@ td.aciklama{color:var(--gri);font-size:.9rem}
 .sss details[open] summary{background:var(--buz-2)}
 .sss .cevap{padding:0 24px 22px;color:var(--gri)}
 .sss .cevap p:last-child{margin-bottom:0}
+
+/* ================================================================ içindekiler */
+.icindekiler{
+  background:var(--buz-2);border:1px solid var(--gri-acik);border-left:4px solid var(--mavi);
+  border-radius:0 var(--r) var(--r) 0;padding:22px 26px;margin:26px 0 32px;
+}
+.icindekiler .ic-bas{
+  font-size:.79rem;font-weight:800;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--mavi);margin:0 0 .9em;
+}
+.icindekiler ol{margin:0;padding-left:1.35em;columns:2;column-gap:30px}
+@media(max-width:640px){.icindekiler ol{columns:1}}
+.icindekiler li{margin:0 0 .5em;break-inside:avoid;font-size:.96rem}
+.icindekiler a{color:var(--lacivert-2);font-weight:650}
+.icindekiler a:hover{color:var(--mavi)}
+/* çıpaya atlarken sabit başlığın altında kalmasın */
+h2[id]{scroll-margin-top:calc(var(--ust-h) + 18px)}
+
+.ana-bag p{margin:0}
+
+/* örümcek ağı bağlantı bloğu */
+.ag{padding:clamp(34px,4.5vw,54px) 0}
+.ag h3{font-size:.8rem;font-weight:800;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--mavi);margin-bottom:1.1em}
+.ag ul{list-style:none;padding:0;margin:0;font-size:.95rem}
+.ag li{margin:0;border-top:1px solid var(--gri-acik)}
+.ag li:first-child{border-top:0}
+.ag a{display:block;padding:9px 0;color:var(--lacivert-2);font-weight:600}
+.ag a:hover{color:var(--mavi);text-decoration:none;padding-left:5px;transition:padding .16s}
 
 /* ================================================================ vurgu kutusu */
 .kutu{border-left:4px solid var(--mavi);background:var(--buz);border-radius:0 var(--r) var(--r) 0;padding:22px 26px;margin:26px 0}

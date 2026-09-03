@@ -62,6 +62,13 @@ def main():
             if len(v) > 175:
                 uyarilar.append(f"{url} description uzun ({len(v)} kr)")
 
+        # f-string bölünürse şablon ifadeleri metin olarak basılır — asla kaçmasın
+        govde_m = re.search(r"<main[^>]*>(.*)</main>", s, re.S)
+        if govde_m:
+            for y in set(re.findall(r"\{[a-zA-Z_][a-zA-Z0-9_\.\[\]'\"() +:-]{2,60}\}",
+                                    govde_m.group(1))):
+                hatalar.append(f"{url} ŞABLON KODU SIZDI: {y}")
+
         for y in re.findall(r"<!-- eksik [^>]*>", s):
             hatalar.append(f"{url} SESSİZ DÜŞEN VARLIK: {y}")
 

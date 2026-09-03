@@ -7,7 +7,7 @@
 import data as D
 import arizalar as A
 from build import (IKON, resim, video_kapak, sss_blok, faq_sema, yerel_isletme_sema, k, SITE, I,
-                   bulunma, ayrilma, yonelme, WA_LINK, h1_tel)
+                   bulunma, ayrilma, yonelme, WA_LINK, h1_tel, ana_baglanti, capraz_ag)
 
 # --------------------------------------------------------------- ortak parçalar
 
@@ -502,7 +502,9 @@ def cihaz_sayfasi(c):
 <div class="metin">
 {h1_tel(c['baslik'])}
 {resim(g, alt, boy="(max-width:980px) 92vw, 700px", oncelik=True)}
+<!--ICINDEKILER-->
 {CIHAZ_ICERIK[c['slug']]}
+{ana_baglanti(c['slug'])}
 </div>
 {yan_kutu(diger + bolge[:3], "Diğer cihazlar ve bölgeler")}
 </div></div></section>
@@ -550,6 +552,7 @@ bildirilir. Onarımı yaptırırsanız çağrı ücretinde indirim uygulanır.</
     govde += sss_bolumu(CIHAZ_SSS[c["slug"]],
                         f"Batman {c['ad_tamlama']} tamiri hakkında sık sorulan sorular",
                         alt=True)
+    govde += capraz_ag("cihaz-" + c["slug"], cihaz_slug=c["slug"], marka_sayi=6, bolge_sayi=6)
     return govde
 
 
@@ -588,6 +591,161 @@ bu adım atlandığında gereksiz yere kompresör masrafı çıkıyor.</p>
 }
 
 
+# --------------------------------------------------------------- marka: grup ve konum
+# ⚠️ Buradaki bilgiler ya işletmenin anlatımından (rezistans konumu, parça bulunabilirliği)
+#    ya da markanın hangi çatı altında olduğu gibi kamuya açık, doğrulanabilir sahiplik
+#    bilgisinden geliyor. ⛔ "Şu markada şu arıza çok çıkar" gibi saha iddiası UYDURMA —
+#    öyle bir not gelirse D.MARKA_NOT'a işletmeden alınarak yazılır.
+
+GRUP_METIN = {
+"Arçelik": """<p>{ad}, <strong>Arçelik çatısı</strong> altındaki markalardan biri. Bu çatıdaki
+cihazlar büyük ölçüde <strong>aynı parça ailesini ve aynı servis mantığını</strong> paylaşır:
+pompa, ventil, rezistans ve kart mimarisi birbirine yakındır. Pratikte bunun iki sonucu var —
+{kardes} üzerinde edindiğimiz tecrübe doğrudan {ad} cihazlarına da yansıyor ve
+<strong>yedek parça bulmak rahat oluyor.</strong></p>""",
+"BSH": """<p>{ad}, <strong>BSH çatısı</strong> altındaki markalardan biri; {kardes} ile aynı
+mühendislik yaklaşımını paylaşır. Bu grubun bizim için en belirleyici özelliği bulaşık makinesi
+tarafındaki yapı farkı — aşağıda ayrıca anlattık, çünkü <strong>aynı arıza bu grupta farklı
+fiyatlanıyor.</strong></p>""",
+"Vestel": """<p>{ad}, <strong>Vestel çatısı</strong> altındaki markalardan biri ve {kardes} ile
+aynı parça ailesini kullanıyor. Bu gruptaki cihazlarda <strong>parça temini en rahat olan
+taraf</strong>; elimizde olmayan bir parçayı çoğunlukla 1–2 gün içinde getirtebiliyoruz.</p>""",
+"Samsung": """<p>{ad} buzdolaplarında <strong>no-frost</strong> sistem yaygın. Bu, arızanın
+karakterini değiştiriyor: klasik buzlanma yerine <strong>rezistans, fan ve elektronik kart</strong>
+kaynaklı şikâyetler öne çıkıyor. Teşhis sırası da bu yüzden farklı ilerliyor.</p>""",
+"LG": """<p>{ad} buzdolaplarında <strong>no-frost</strong> sistem yaygın. Buz gördüğünüzde akla ilk
+gelen, buzu eriten <strong>rezistansın çalışmamasıdır</strong>; biriken buz fanın önünü kapattığı
+için şikâyet kısa sürede sese dönüşüyor. Kart ve fan kaynaklı arızalar da bu tarafta öne çıkıyor.</p>""",
+}
+
+# Markanın kendi çatısı içindeki yeri — yalnızca sahiplik/üretim bilgisi, saha iddiası değil.
+MARKA_KONUM = {
+"arcelik": "Arçelik, çatının ana markası; bu ailedeki parça mantığının referansı sayılabilir.",
+"beko":    "Beko, Arçelik'in uluslararası pazarlara açılan markası; parça tarafında Arçelik'le büyük ölçüde ortak.",
+"altus":   "Altus, aynı çatının daha uygun fiyatlı segmentinde konumlanıyor; parçaları da bu ailenin içinden çıkıyor.",
+"grundig": "Grundig, Alman kökenli bir marka olmakla birlikte bugün aynı çatının altında; servis tarafında Arçelik ailesiyle aynı mantıkla ilerliyoruz.",
+"bosch":   "Bosch, bu grubun en yaygın markası; bulaşık makinesi tarafındaki yapı farkı en çok bu markada karşımıza çıkıyor.",
+"siemens": "Siemens, Bosch ile aynı mühendislik ailesinden; parça ve arıza mantığı büyük ölçüde örtüşüyor.",
+"profilo": "Profilo, aynı grubun Türkiye pazarına yönelik markası; parça temini bu tarafta daha rahat.",
+"vestel":  "Vestel, çatının ana markası ve Manisa üretimi olduğu için parçaya ulaşmak en kolay taraf.",
+"regal":   "Regal, aynı çatının uygun fiyatlı markası; parçaları Vestel ailesiyle ortak.",
+"seg":     "SEG, aynı grubun içinde yer alıyor; servis ve parça mantığı Vestel ile aynı ilerliyor.",
+"samsung": "Samsung tarafında no-frost buzdolabı ve elektronik kart ağırlıklı bir arıza profili görüyoruz.",
+"lg":      "LG tarafında da no-frost sistem yaygın; teşhiste rezistans, fan ve kart sırasıyla ilerliyoruz.",
+}
+
+# Marka sayfasındaki cihaz bölümleri — metin işletmenin anlatımından, marka adı yerleştiriliyor.
+# Cihaz bölümleri AİLEYE göre ayrışır — aynı metni 12 sayfaya kopyalamamak için.
+# ⛔ Marka bazlı saha iddiası YOK; ailenin gerçek yapı farkı üzerinden yazıldı.
+MARKA_CIHAZ = {
+"buzdolabi": {
+ "yerli": """<p>{ad} buzdolabı soğutmuyorsa iki ihtimal var: gaz kaynaklı bir sorun ya da
+kompresörün (halk arasında "motor") çalışmaması. Bu ailede kompresör ve termostat parçalarına
+ulaşmak rahat olduğu için onarım çoğunlukla <strong>aynı ziyarette</strong> bitiyor.</p>""",
+ "bsh": """<p>{ad} buzdolabında soğutma sorununda önce gaz devresine ve kompresöre bakıyoruz.
+Bu grupta parça maliyeti yerli markalara göre daha yüksek olabildiği için, işleme başlamadan
+<strong>maliyeti net söylemeye</strong> özellikle dikkat ediyoruz.</p>""",
+ "kore": """<p>{ad} buzdolaplarında no-frost sistem yaygın. Buz görüyorsanız akla ilk gelen,
+buzu eriten <strong>rezistansın çalışmamasıdır</strong>; biriken buz fanın önünü kapattığı için
+şikâyet kısa sürede sese dönüşür. Kart arızasında, motoru değiştirmeden önce
+<strong>kartın motora çıkış verip vermediğine</strong> bakıyoruz.</p>""",
+},
+"camasir-makinesi": {
+ "yerli": """<p>{ad} çamaşır makinesi su almıyorsa arkadaki su ventili suyu iletmiyordur;
+ventil sağlamsa kart ventile elektrik vermiyordur. Bu ailede ventil ve pompa gibi sık değişen
+parçalar <strong>stokta bulunur</strong>, iş genelde tek ziyarette biter.</p>""",
+ "bsh": """<p>{ad} çamaşır makinesinde su alma ve boşaltma arızalarının mantığı diğer markalarla
+aynı: ventil, pompa, kart. Fark maliyette — bu grupta parça fiyatları daha yüksek olabiliyor,
+o yüzden <strong>tespitten sonra rakamı söyleyip onayınızı alıyoruz.</strong></p>""",
+ "kore": """<p>{ad} çamaşır makinelerinde elektronik kart kaynaklı şikâyetler öne çıkıyor.
+Kart suçlanmadan önce ventil, pompa ve kapı kilidi sırayla eleniyor — çünkü bu üç parçanın
+arızası da makineyi "hiç çalışmıyor" gibi gösterebiliyor.</p>""",
+},
+"bulasik-makinesi": {
+ "yerli": """<p>Bu ailede bulaşık makinesinin en belirleyici avantajı şu:
+<strong>rezistans (ısıtıcı) motorun yan tarafındadır.</strong> Arızalandığında motorun tamamı
+değil yalnızca rezistans değişir — aynı arıza Bosch, Siemens ve Profilo'ya göre
+<strong>çok daha uygun</strong> çözülür.</p>""",
+ "bsh": """<p>{ad} bulaşık makinelerinde <strong>rezistans motorun içindedir.</strong>
+Arızalandığında ayrı değiştirilemez, <strong>komple motor değişir</strong> — bu da onarımı
+Arçelik veya Vestel gibi markalara göre belirgin şekilde pahalı hâle getirir. Bunu telefonda
+arızayı dinlediğimizde söylüyoruz ki "makine ısıtmıyor" şikâyetinin bu markada aynı maliyette
+olmadığını baştan bilesiniz.</p>""",
+ "kore": """<p>{ad} bulaşık makinesinde su almama ve boşaltmama arızaları ventil ve pompa
+kaynaklı; kirli çıkan bulaşıkta ise pervane (fıskiye) tıkanmıştır. Alttaki filtreyi
+<strong>üç ayda bir</strong> açıp temizlemek bu şikâyetlerin çoğunu baştan önlüyor.</p>""",
+},
+"derin-dondurucu": {
+ "yerli": """<p>{ad} derin dondurucuda üç arıza öne çıkıyor: <strong>termostat, gaz kaçağı ve
+kompresör.</strong> Kompresör değişimi litreye göre 8.000 – 10.000 TL; 400, 500, 600 ve 800 litre
+modellerde onarım yapıyoruz.</p>""",
+ "bsh": """<p>{ad} derin dondurucuda da sıralama aynı: termostat, gaz kaçağı, kompresör.
+Kompresör değişimi litreye göre 8.000 – 10.000 TL. Gaz kaçağı gövde içindeyse dolabın arkası
+kesiliyor; masraf cihazın değerine yaklaşıyorsa <strong>onarım yaptırmamanızı öneriyoruz.</strong></p>""",
+ "kore": """<p>{ad} derin dondurucuda termostat, gaz kaçağı ve kompresör arızaları öne çıkıyor.
+Soğutma sistemleri bizim belgeli uzmanlık alanımız — MEB iş yeri açma belgemizde meslek dalı
+olarak <strong>"Soğutma Sistemleri"</strong> yazıyor.</p>""",
+},
+}
+
+# Rehber havuzları cihaz bazında; markaya göre farklı dörtlü seçiliyor.
+MARKA_REHBER = {
+"buzdolabi": ["buzdolabi-sogutmuyor", "buzdolabi-ses-yapiyor", "buzdolabi-surekli-calisiyor",
+              "buzdolabi-su-akitiyor", "buzdolabi-kompresor-arizasi", "buzdolabi-gaz-kacagi",
+              "buzdolabi-buzlanma-yapiyor", "buzdolabi-calismiyor", "buzdolabi-kapak-lastigi"],
+"camasir-makinesi": ["camasir-makinesi-su-almiyor", "camasir-makinesi-su-bosaltmiyor",
+              "camasir-makinesi-sikma-yapmiyor", "camasir-makinesi-kapi-kilidi-arizasi",
+              "camasir-makinesi-ses-yapiyor", "camasir-makinesi-pompa-arizasi",
+              "camasir-makinesi-koku-yapiyor", "camasir-makinesi-rezistans-arizasi",
+              "camasir-makinesi-deterjan-almiyor", "camasir-makinesi-temiz-yikamiyor"],
+"bulasik-makinesi": ["bulasik-makinesi-su-almiyor", "bulasik-makinesi-su-bosaltmiyor",
+              "bulasik-makinesi-calismiyor", "bulasik-makinesi-iyi-yikamiyor",
+              "bulasik-makinesi-filtre-temizligi", "bulasik-makinesi-rezistans-arizasi",
+              "bulasik-makinesi-kopuruyor", "bulasik-makinesi-koku-yapiyor",
+              "bulasik-makinesi-kurutmuyor", "bulasik-makinesi-ses-yapiyor"],
+"derin-dondurucu": ["derin-dondurucu-sogutmuyor", "derin-dondurucu-motor-arizasi",
+              "buzdolabi-gaz-kacagi", "buzdolabi-kompresor-arizasi"],
+}
+
+# Aileye göre cihaz sırası — hangi cihazın önce anlatılacağı markaya göre değişsin.
+AILE_CIHAZ_SIRASI = {
+    "bsh":   ["bulasik-makinesi", "camasir-makinesi", "buzdolabi", "derin-dondurucu"],
+    "kore":  ["buzdolabi", "derin-dondurucu", "camasir-makinesi", "bulasik-makinesi"],
+    "yerli": ["camasir-makinesi", "buzdolabi", "bulasik-makinesi", "derin-dondurucu"],
+}
+
+
+def marka_cihaz_bolumleri(m):
+    """Her marka için 4 cihaz bölümü; sıralama aileye, vurgulanan rehberler markaya göre döner."""
+    ariza_ad = {a["slug"]: a for a in A.ARIZALAR}
+    cihaz_ad = {c["slug"]: c for c in D.CIHAZLAR}
+    kaydir = sum(ord(x) for x in m["slug"])         # markadan markaya farklı rehber seçimi
+    p = []
+    for j, cs in enumerate(AILE_CIHAZ_SIRASI[m["aile"]]):
+        metin = MARKA_CIHAZ[cs][m["aile"]]
+        rehberler = MARKA_REHBER[cs]
+        c = cihaz_ad[cs]
+        b = (kaydir + j * 3) % len(rehberler)
+        sec = [rehberler[(b + i) % len(rehberler)] for i in range(min(4, len(rehberler)))]
+        bag = "".join(
+            f'<li><a href="/{r}/">{k(ariza_ad[r]["soru"])}</a></li>'
+            for r in sec if r in ariza_ad)
+        p.append(f"""<h2>Batman {k(m['ad'])} {k(c['ad_tamlama'])} tamiri</h2>
+{metin.format(ad=k(m['ad']))}
+<p>Bu cihazda en çok sorulan arızalar:</p>
+<ul class="capraz">{bag}</ul>
+<p><a class="devam" href="/batman-{cs}-tamircisi/">{k(c['baslik'])} sayfası {IKON['okd']}</a></p>""")
+    return "\n".join(p)
+
+
+def marka_fiyat_tablosu(m):
+    satir = "".join(f"<tr><td>{k(a)}</td><td class='ucret'>{k(u)}</td>"
+                    f"<td class='aciklama'>{k(x)}</td></tr>" for a, u, x in D.FIYATLAR)
+    return (f'<div class="tbl-sar"><table><thead><tr><th scope="col">İşlem</th>'
+            f'<th scope="col">Ücret</th><th scope="col">Açıklama</th></tr></thead>'
+            f'<tbody>{satir}</tbody></table></div>')
+
+
 def marka_sayfasi(m):
     kardes = [(f"Batman {x['ad']} Servisi", f"/batman-{x['slug']}-servisi/")
               for x in D.MARKALAR if x["slug"] != m["slug"]]
@@ -598,12 +756,19 @@ def marka_sayfasi(m):
     ariza_kart = "".join(
         f'<li><a href="/{a["slug"]}/">{k(a["soru"])}</a></li>' for a in A.ARIZALAR[:10])
     ayni_grup = [x for x in D.MARKALAR if x["grup"] == m["grup"] and x["slug"] != m["slug"]]
-    grup_notu = ""
+    adlar = ", ".join(x["ad"] for x in ayni_grup) or m["ad"]
+    grup_notu = GRUP_METIN[m["grup"]].format(ad=k(m["ad"]), kardes=k(adlar))
+    konum = MARKA_KONUM.get(m["slug"], "")
+    konum_p = f"<p>{k(konum)}</p>" if konum else ""
+    grup_bag = ""
     if ayni_grup:
-        adlar = ", ".join(x["ad"] for x in ayni_grup)
-        grup_notu = (f'<p>{k(m["ad"])}, <strong>{k(m["grup"])}</strong> çatısı altındaki '
-                     f'{k(adlar)} ile aynı parça ve servis mantığını paylaşıyor; '
-                     f'bu markalarda edindiğimiz tecrübe doğrudan {k(m["ad"])} cihazlarına da yansıyor.</p>')
+        grup_bag = ('<p>Aynı çatıdaki diğer sayfalarımız: ' + " · ".join(
+            f'<a href="/batman-{x["slug"]}-servisi/">Batman {k(x["ad"])} Servisi</a>'
+            for x in ayni_grup) + "</p>")
+    bolge_bag = " · ".join(
+        f'<a href="/{b["slug"]}-beyaz-esya-servisi/">{k(b["ad"])}</a>' for b in D.BOLGELER)
+    ozel = D.MARKA_NOT.get(m["slug"])
+    ozel_blok = (f'<h2>{k(m["ad"])} cihazlarda saha notumuz</h2><p>{ozel}</p>') if ozel else ""
 
     return f"""<section><div class="kap"><div class="yan">
 <div class="metin">
@@ -611,11 +776,25 @@ def marka_sayfasi(m):
 <p>Batman merkez ve ilçelerinde <strong>{k(m['ad'])}</strong> buzdolabı, çamaşır makinesi,
 bulaşık makinesi ve derin dondurucu onarımı yapıyoruz. Marka ayrımı yapmıyor, sekiz yılı aşkın
 saha tecrübemizle tüm modellere bakıyoruz.</p>
+<!--ICINDEKILER-->
+<h2>{k(m['ad'])} hangi çatının altında, bu servis için ne anlama geliyor?</h2>
 {grup_notu}
+{konum_p}
+{grup_bag}
+{AILE_METIN[m['aile']].format(ad=m['ad'])}
+{ozel_blok}
+{marka_cihaz_bolumleri(m)}
+<h2>Batman {k(m['ad'])} servis ücretleri</h2>
+<p>Servis (yol) ücretimiz Batman merkezde ve ilçelerde <strong>600 TL</strong>, Batman'a bağlı
+köylerde 1.000 TL. Parça ve işçilik ayrıca; kesin rakamı arıza yerinde tespit edildikten sonra,
+<strong>işleme başlamadan önce</strong> söylüyoruz.</p>
+{marka_fiyat_tablosu(m)}
+<p class="tbl-not">Onarımı bize yaptırırsanız çağrı ücretinde indirim uygulanır. Masraf cihazın
+değerine yaklaşıyorsa bunu da açıkça belirtiyor, gerektiğinde onarım yaptırmamanızı öneriyoruz.</p>
+<h2>{k(m['ad'])} için ne kadar sürede geliyoruz?</h2>
 <p>Batman merkezde <strong>genellikle 2 saat içinde</strong> adresinizdeyiz; Beşiri, Gercüş,
 Hasankeyf, Kozluk ve Sason'a en geç 1 gün içinde geliyoruz. Acil durumlarda
-<strong>7 gün 24 saat</strong> ulaşabilirsiniz.</p>
-{AILE_METIN[m['aile']].format(ad=m['ad'])}
+<strong>7 gün 24 saat</strong> ulaşabilirsiniz. Bölge sayfaları: {bolge_bag}</p>
 <h2>Yetkili servis mi, biz mi?</h2>
 <p>Cihazınız <strong>garanti kapsamındaysa</strong> önce {k(m['ad'])} yetkili servisine gitmenizi
 öneriyoruz — işlem ücretsiz olabilir ve bağımsız bir servise yaptıracağınız müdahale garantinizi
@@ -625,6 +804,7 @@ daha uygun oluyor.</p>
 <p>{k(m['ad'])} için gereken parça elimizde yoksa sipariş ediyor, <strong>1–2 gün içinde</strong>
 takılmasını sağlıyoruz. Süreç boyunca sizi bilgilendiriyoruz. Taktığımız her parça
 <strong>1 yıl garantilidir.</strong></p>
+{ana_baglanti('marka-' + m['slug'])}
 {cta_kutu()}
 </div>
 {yan_kutu(kardes[:8], "Diğer markalar")}
@@ -644,7 +824,8 @@ takılmasını sağlıyoruz. Süreç boyunca sizi bilgilendiriyoruz. Taktığım
 <p class="tbl-not">Onarımı bize yaptırırsanız çağrı ücretinde indirim uygulanır.</p></div>
 </div></div></section>
 
-{sss_bolumu(marka_sss(m), f"Batman {m['ad']} servisi hakkında sık sorulan sorular", alt=True)}"""
+{sss_bolumu(marka_sss(m), f"Batman {m['ad']} servisi hakkında sık sorulan sorular", alt=True)}
+{capraz_ag("marka-" + m["slug"], marka_sayi=6, bolge_sayi=6)}"""
 
 
 # --------------------------------------------------------------- bölge sayfaları
@@ -692,6 +873,7 @@ def bolge_sayfasi(b):
 {h1_tel(b['ad'] + ' Beyaz Eşya Servisi')}
 <p>{k(b['ad'])} bölgesinde buzdolabı, çamaşır makinesi, bulaşık makinesi ve derin dondurucu
 onarımı yapıyoruz. Varış süremiz <strong>{k(b['sure'])}</strong>.</p>
+<!--ICINDEKILER-->
 {metin}
 <h2>{bulunma(k(b['ad']))} hangi cihazlara bakıyoruz?</h2>
 <p>Dört cihaz grubunda çalışıyoruz: buzdolabı, çamaşır makinesi, bulaşık makinesi ve derin
@@ -705,6 +887,7 @@ buzdolabındaki gıdanın tamamı bozulur. Bu, sahada uyguladığımız gerçek 
 <p>Servis ücretimiz {ucret_sat}. Bu ücret arızanın yerinde tespiti karşılığıdır; onarımı
 yaptırmak istemezseniz yalnızca bunu ödersiniz. <strong>Onarımı bize yaptırırsanız çağrı
 ücretinde indirim uygulanır.</strong> Taktığımız parçalar <strong>1 yıl garantili.</strong></p>
+{ana_baglanti('bolge-' + b['slug'])}
 {cta_kutu(b['ad'])}
 </div>
 {yan_kutu(kardes, "Diğer hizmet bölgeleri")}
@@ -725,4 +908,5 @@ yaptırmak istemezseniz yalnızca bunu ödersiniz. <strong>Onarımı bize yaptı
 
 {saha_videolari(BOLGE_VIDEO.get(b['slug'], []), "Sahadan görüntüler",
                 "Aşağıdaki görüntüler stok video değil — Batman'da kendi yaptığımız onarımlardan.")}
-{sss_bolumu(bolge_sss(b), f"{b['ad']} beyaz eşya servisi hakkında sık sorulan sorular")}"""
+{sss_bolumu(bolge_sss(b), f"{b['ad']} beyaz eşya servisi hakkında sık sorulan sorular")}
+{capraz_ag("bolge-" + b["slug"], marka_sayi=6, bolge_sayi=5)}"""

@@ -79,6 +79,114 @@ def yonelme(ad):
     return f"{ad}'{y}{a}"
 
 
+# ------------------------------------------------------------------ içindekiler
+
+_TR = str.maketrans("çğıöşüÇĞİÖŞÜ", "cgiosucgiosu")
+
+
+def slugla(metin):
+    t = re.sub(r"<[^>]+>", " ", metin)
+    t = html.unescape(t).translate(_TR).lower()
+    t = re.sub(r"[^a-z0-9]+", "-", t).strip("-")
+    return t or "bolum"
+
+
+def icerik_haritasi(govde, baslik="Bu sayfada neler var?"):
+    """Gövdedeki H2'lere id verir; <!--ICINDEKILER--> yerine tıklanabilir liste koyar."""
+    ogeler, gorulen = [], {}
+
+    def h2(m):
+        ic = m.group(2)
+        if 'id="' in m.group(1):
+            return m.group(0)
+        sl = slugla(ic)
+        gorulen[sl] = gorulen.get(sl, 0) + 1
+        if gorulen[sl] > 1:
+            sl = f"{sl}-{gorulen[sl]}"
+        etiket = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", ic)).strip()
+        ogeler.append((sl, etiket))
+        return f"<h2{m.group(1)} id=\"{sl}\">{ic}</h2>"
+
+    govde = re.sub(r"<h2([^>]*)>(.*?)</h2>", h2, govde, flags=re.S)
+
+    if "<!--ICINDEKILER-->" not in govde:
+        return govde
+    if len(ogeler) < 3:
+        return govde.replace("<!--ICINDEKILER-->", "")
+    liste = "".join(f'<li><a href="#{sl}">{k(ad)}</a></li>' for sl, ad in ogeler)
+    kutu = (f'<nav class="icindekiler" aria-label="{k(baslik)}">'
+            f'<h2 class="ic-bas">{k(baslik)}</h2><ol>{liste}</ol></nav>')
+    return govde.replace("<!--ICINDEKILER-->", kutu, 1)
+
+
+# ------------------------------------------------------------------ ana sayfa bağlantısı
+
+# Kullanıcının verdiği çapa metinleri — sayfadan sayfaya dönüşümlü kullanılır.
+ANA_CAPA = [
+    ("Batman beyaz eşya servisi",
+     "Cihaz, marka ve bölge sayfalarımızın tamamına {L} ana sayfamızdan ulaşabilirsiniz."),
+    ("Batman beyaz eşya tamircisi",
+     "Aradığınız arıza burada yoksa {L} sayfamızdaki rehber listesine göz atın."),
+    ("Batman beyaz eşya servis",
+     "Ücretler, varış süreleri ve sık sorulan soruların tamamı {L} ana sayfamızda."),
+    ("beyaz eşya tamircisi Batman",
+     "{L} araması yapıp doğru servisi seçmenin yolunu ana sayfamızda anlattık."),
+    ("Batman beyaz eşya teknik servisi",
+     "Dört cihaz grubunda neler yaptığımızı {L} ana sayfamızda ayrıntılı yazdık."),
+]
+
+
+def ana_baglanti(tohum, sinif="kutu"):
+    """İç sayfadan ana sayfaya, çapası sayfaya göre değişen bağlantı bloğu."""
+    capa, cumle = ANA_CAPA[sum(ord(c) for c in str(tohum)) % len(ANA_CAPA)]
+    bag = f'<a href="/">{k(capa)}</a>'
+    return (f'<div class="{sinif} ana-bag"><p>{cumle.format(L=bag)} '
+            f'Acil bir arıza varsa <a href="tel:{I["tel_link"]}">{I["tel_yazi"]}</a> '
+            f'numarasından 7 gün 24 saat ulaşabilirsiniz.</p></div>')
+
+
+def capraz_ag(tohum, cihaz_slug=None, haric_ariza=None, marka_sayi=4, bolge_sayi=3):
+    """Örümcek ağı bloğu: her iç sayfadan cihaz + marka + bölge + kardeş rehberlere köprü.
+    Seçim tohuma göre döndüğü için sayfadan sayfaya farklı komşulara link gidiyor."""
+    n = sum(ord(c) for c in str(tohum))
+
+    def dondur(liste, adet):
+        if not liste:
+            return []
+        b = n % len(liste)
+        return [liste[(b + i) % len(liste)] for i in range(min(adet, len(liste)))]
+
+    sut = []
+    if cihaz_slug:
+        c = next(x for x in D.CIHAZLAR if x["slug"] == cihaz_slug)
+        digerleri = [x for x in D.CIHAZLAR if x["slug"] != cihaz_slug]
+        ic = f'<li><a href="/batman-{c["slug"]}-tamircisi/"><strong>{k(c["baslik"])}</strong></a></li>'
+        ic += "".join(f'<li><a href="/batman-{x["slug"]}-tamircisi/">{k(x["baslik"])}</a></li>'
+                      for x in digerleri)
+        sut.append(("Cihaz sayfaları", ic))
+    else:
+        sut.append(("Cihaz sayfaları", "".join(
+            f'<li><a href="/batman-{x["slug"]}-tamircisi/">{k(x["baslik"])}</a></li>'
+            for x in D.CIHAZLAR)))
+
+    sut.append(("Markalar", "".join(
+        f'<li><a href="/batman-{x["slug"]}-servisi/">Batman {k(x["ad"])} Servisi</a></li>'
+        for x in dondur(D.MARKALAR, marka_sayi))))
+    sut.append(("Hizmet bölgeleri", "".join(
+        f'<li><a href="/{x["slug"]}-beyaz-esya-servisi/">{k(x["ad"])} Beyaz Eşya Servisi</a></li>'
+        for x in dondur(D.BOLGELER, bolge_sayi))))
+
+    havuz = [a for a in A.ARIZALAR
+             if a["slug"] != haric_ariza and (not cihaz_slug or a["cihaz"] == cihaz_slug)]
+    if len(havuz) < 4:
+        havuz = [a for a in A.ARIZALAR if a["slug"] != haric_ariza]
+    sut.append(("İlgili arıza rehberleri", "".join(
+        f'<li><a href="/{a["slug"]}/">{k(a["soru"])}</a></li>' for a in dondur(havuz, 5))))
+
+    ic = "".join(f'<div><h3>{k(b)}</h3><ul>{l}</ul></div>' for b, l in sut)
+    return f'<section class="alt ag"><div class="kap"><div class="izgara iz-4">{ic}</div></div></section>'
+
+
 def h1_tel(baslik, sinif=""):
     """İç sayfa H1'i + tıklanabilir telefon satırı (kullanıcı isteği, 2026-09-03)."""
     return (f'<h1 class="h1-tel {sinif}">{k(baslik)}'
@@ -495,6 +603,7 @@ def iskelet(*, slug, baslik, aciklama, govde, semalar, kirinti_html="",
         if isinstance(n, dict) and n.get("@type") == "BreadcrumbList":
             sayfa["breadcrumb"] = {"@id": n["@id"]} if "@id" in n else n
             break
+    govde = icerik_haritasi(govde)
     varsa = {n.get("@id") for n in semalar if isinstance(n, dict)}
     on = [sayfa] if SITE + "/#site" in varsa else [sayfa, web_site_sema()]
     semalar = on + [n for n in semalar if n]

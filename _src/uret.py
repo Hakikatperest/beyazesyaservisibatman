@@ -80,8 +80,10 @@ def uret_arizalar():
 <div class="metin">
 {B.h1_tel(a['soru'])}
 {gorsel}
+<!--ICINDEKILER-->
 {a['govde']}
 {video}
+{B.ana_baglanti(a['slug'])}
 <div class="kutu"><b>Batman'da bu arıza için bize ulaşın</b>
 <p>Batman merkezde <strong>genellikle 2 saat içinde</strong> adresinizdeyiz; Beşiri, Gercüş,
 Hasankeyf, Kozluk ve Sason'a en geç 1 gün içinde geliyoruz. Arızayı yerinde tespit edip maliyeti
@@ -99,7 +101,8 @@ işleme başlamadan söylüyoruz. Taktığımız parçalar <strong>1 yıl garant
 <a class="dg dg-ara" href="tel:{I['tel_link']}" style="background:#fff;color:var(--lacivert)">{B.IKON['tel']}{I['tel_yazi']}</a>
 <a class="dg dg-wa" href="{B.WA_LINK}" rel="noopener" target="_blank">{B.IKON['wa']}WhatsApp</a>
 </div></aside>
-</div></div></section>"""
+</div></div></section>
+""" + B.capraz_ag(a["slug"], cihaz_slug=a["cihaz"], haric_ariza=a["slug"])
 
         semalar = [
             B.yerel_isletme_sema(), kir_sema,
