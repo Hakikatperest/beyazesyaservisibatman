@@ -15,6 +15,10 @@ ISLETME = {
     "tel_yazi": "0553 711 83 21",
     "tel_link": "+905537118321",
     "wa": "905537118321",
+    # İkinci hat — kullanıcı 2026-09-03'te "ikisi de benim" dedi.
+    # ⚠️ WhatsApp YALNIZCA birinci numarada; ikincisi için WhatsApp bağlantısı verme.
+    "tel2_yazi": "0554 166 25 72",
+    "tel2_link": "+905541662572",
     "adres_sokak": "Fatih Mah. 3206. Sk. No:12",
     "adres_ilce": "Merkez",
     "adres_il": "Batman",

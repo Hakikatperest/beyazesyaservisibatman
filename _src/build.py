@@ -79,6 +79,13 @@ def yonelme(ad):
     return f"{ad}'{y}{a}"
 
 
+def h1_tel(baslik, sinif=""):
+    """İç sayfa H1'i + tıklanabilir telefon satırı (kullanıcı isteği, 2026-09-03)."""
+    return (f'<h1 class="h1-tel {sinif}">{k(baslik)}'
+            f'<a href="tel:{I["tel_link"]}" aria-label="Telefonla ara: {I["tel_yazi"]}">'
+            f'{IKON["tel"]}{I["tel_yazi"]}</a></h1>')
+
+
 def baslik_kes(ana, ekler=("Batman Beyaz Eşya Servisi", "Batman Servisi"), sinir=65):
     """SERP ~60-65 karakterde kesiyor. Marka eki sığmıyorsa kısaltır, yine sığmazsa düşürür."""
     for ek in ekler:
@@ -113,10 +120,11 @@ def resim(ad, alt, sinif="", boy="100vw", oncelik=False, oran=None):
             setler.append(f"/images/w{w}/{ad} {w}w")
     setler.append(f"/images/{ad} {g}w")
     yukleme = 'loading="eager" fetchpriority="high"' if oncelik else 'loading="lazy" decoding="async"'
-    # oran verilirse kutu sabitlenir ve görsel kırpılır; verilmezse doğal oran korunur
-    # (afişlerde basılı yazı var — onlara oran VERME).
-    stil = (f' style="aspect-ratio:{oran};height:auto;object-fit:cover"' if oran
-            else ' style="height:auto"')
+    # ⛔ KIRPMA YOK (kullanıcı kararı 2026-09-03): görselin tamamı görünmeli.
+    # Dikey fotoğraflar sayfayı ele geçirmesin diye .dikey sınıfıyla genişlik sınırlanıyor.
+    stil = ' style="height:auto"'
+    if y > g * 1.15:
+        sinif = (sinif + " dikey").strip()
     return (
         f'<picture class="{sinif}">'
         f'<img src="/images/{ad}" srcset="{", ".join(setler)}" sizes="{boy}" '
@@ -194,11 +202,13 @@ def video_kapak(video_ad, poster_ad, etiket, dikey=True, aciklama=None):
         return f"<!-- eksik video: {video_ad} -->"
     poster = f"/images/w640/{poster_ad}" if os.path.exists(
         os.path.join(KOK, "images", "w640", poster_ad)) else f"/images/{poster_ad}"
+    pg, py = media.olcu(poster_ad)
+    oran_stil = f' style="aspect-ratio:{pg}/{py}"'   # kutu posterin oranını alır
     _SAYFA_VIDEO.append((video_ad, poster, etiket,
                          aciklama or (etiket + " — Batman'da kendi yaptığımız onarımdan "
                                       "çekilmiş saha görüntüsü.")))
     return (
-        f'<div class="video-kutu{" dikey" if dikey else ""}" data-video="/video/{video_ad}">'
+        f'<div class="video-kutu{" dikey" if dikey else ""}"{oran_stil} data-video="/video/{video_ad}">'
         f'<img src="{poster}" alt="{k(etiket)}" loading="lazy" decoding="async" width="640" height="853">'
         f'<button class="oynat" type="button" aria-label="{k(etiket)} videosunu oynat">'
         f'<i><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></i></button>'
@@ -256,7 +266,7 @@ def yerel_isletme_sema():
         "@id": SITE + "/#isletme",
         "name": I["ad"],
         "url": SITE + "/",
-        "telephone": I["tel_link"],
+        "telephone": [I["tel_link"], I["tel2_link"]],
         "image": SITE + "/images/" + VARSAYILAN_OG,
         "logo": SITE + "/images/logo/logo-380.png",
         "address": {
@@ -363,7 +373,8 @@ def ust_bar():
 def yuzen_iletisim():
     """Sağ kenarda sabit duran hızlı iletişim kartı (geniş ekran)."""
     return f"""<aside class="yuzen" aria-label="Hızlı iletişim">
-<a class="dg dg-ara dg-kucuk" href="tel:{I['tel_link']}">{IKON['tel']}Hemen Ara</a>
+<a class="dg dg-ara dg-kucuk" href="tel:{I['tel_link']}">{IKON['tel']}{I['tel_yazi']}</a>
+<a class="dg dg-ara dg-kucuk" href="tel:{I['tel2_link']}">{IKON['tel']}{I['tel2_yazi']}</a>
 <a class="dg dg-wa dg-kucuk" href="{WA_LINK}" rel="noopener" target="_blank">{IKON['wa']}WhatsApp</a>
 </aside>"""
 
@@ -395,7 +406,9 @@ ve derin dondurucu onarımı. Sekiz yılı aşkın saha tecrübesi, 1 yıl parç
 <div><h4>İletişim</h4>
 <ul class="alt-iletisim">
 <li><i>{IKON['pin']}</i><span><em>Adres</em><b>{k(I['adres_sokak'])}<br>{k(I['posta'])} {k(I['adres_ilce'])} / {k(I['adres_il'])}</b></span></li>
-<li><i>{IKON['tel']}</i><span><em>Telefon &amp; WhatsApp</em><b><a href="tel:{I['tel_link']}">{I['tel_yazi']}</a></b></span></li>
+<li><i>{IKON['tel']}</i><span><em>Telefon &amp; WhatsApp</em>
+<b><a href="tel:{I['tel_link']}">{I['tel_yazi']}</a></b>
+<b><a href="tel:{I['tel2_link']}">{I['tel2_yazi']}</a></b></span></li>
 <li><i>{IKON['saat']}</i><span><em>Çalışma saatleri</em><b>7 gün 24 saat — tatil ve pazar dahil</b></span></li>
 </ul>
 </div>

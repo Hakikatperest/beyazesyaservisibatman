@@ -497,7 +497,7 @@ bağımsız bir servise yaptıracağınız müdahale garantinizi düşürebilir.
 <h2>Batman Beyaz Eşya Servisi Hakkında Bilinmesi Gerekenler</h2>
 <p>Aşağıdaki görüntüler stok video değil — Batman'da kendi yaptığımız onarımlardan.
 Videolar <strong>siz oynatana kadar yüklenmez</strong>, sayfayı yavaşlatmaz.</p></div>
-<div class="izgara iz-3">{v1}{v2}{v3}</div>
+<div class="izgara iz-3 baslangic">{v1}{v2}{v3}</div>
 <div class="izgara iz-2" style="margin-top:34px;align-items:start">
 <div class="kutu"><b>Kapı kilidi arızasında kilidi zorlamayın</b>
 <p>Çamaşır makinesinde kapı kilidi arızası çok sık <strong>kartı da patlatıyor.</strong> Kilit
@@ -532,8 +532,9 @@ adresinizdeyiz. Buzdolabı ve derin dondurucu çağrılarını sıranın önüne
 <p>{k(I['adres_sokak'])}<br>{k(I['posta'])} {k(I['adres_ilce'])} / {k(I['adres_il'])}</p>
 <a class="devam" href="{I['yol_tarifi']}" target="_blank" rel="noopener">Yol tarifi al {IKON['okd']}</a></div>
 <div class="kart"><span class="kart-ik">{IKON['tel']}</span><h3>Telefon &amp; WhatsApp</h3>
-<p>Tek numara üzerinden hem arayabilir hem yazabilirsiniz.</p>
-<a class="devam" href="tel:{I['tel_link']}">{I['tel_yazi']} {IKON['okd']}</a></div>
+<p>İki hattımızdan da ulaşabilirsiniz. WhatsApp birinci numarada açık.</p>
+<a class="devam" href="tel:{I['tel_link']}">{I['tel_yazi']} {IKON['okd']}</a><br>
+<a class="devam" href="tel:{I['tel2_link']}">{I['tel2_yazi']} {IKON['okd']}</a></div>
 <div class="kart"><span class="kart-ik">{IKON['saat']}</span><h3>Varış süresi</h3>
 <p>Batman merkez: genellikle 2 saat içinde.<br>İlçeler: en geç 1 gün içinde.</p></div>
 </div>

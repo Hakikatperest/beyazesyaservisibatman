@@ -7,7 +7,7 @@
 import data as D
 import arizalar as A
 from build import (IKON, resim, video_kapak, sss_blok, faq_sema, yerel_isletme_sema, k, SITE, I,
-                   bulunma, ayrilma, yonelme, WA_LINK)
+                   bulunma, ayrilma, yonelme, WA_LINK, h1_tel)
 
 # --------------------------------------------------------------- ortak parçalar
 
@@ -149,7 +149,7 @@ def saha_videolari(liste, baslik, giris, alt=True):
     return f"""<section{' class="alt"' if alt else ''}><div class="kap">
 <div class="bas"><span class="etiket">Sahadan</span><h2>{k(baslik)}</h2>
 <p>{k(giris)} Videolar <strong>siz oynatana kadar yüklenmez</strong>, sayfayı yavaşlatmaz.</p></div>
-<div class="izgara iz-3">{kutular}</div>
+<div class="izgara iz-3 baslangic">{kutular}</div>
 </div></section>"""
 
 
@@ -500,7 +500,7 @@ def cihaz_sayfasi(c):
 
     govde = f"""<section><div class="kap"><div class="yan">
 <div class="metin">
-<h1>{k(c['baslik'])}</h1>
+{h1_tel(c['baslik'])}
 {resim(g, alt, boy="(max-width:980px) 92vw, 700px", oncelik=True)}
 {CIHAZ_ICERIK[c['slug']]}
 </div>
@@ -607,7 +607,7 @@ def marka_sayfasi(m):
 
     return f"""<section><div class="kap"><div class="yan">
 <div class="metin">
-<h1>Batman {k(m['ad'])} Servisi</h1>
+{h1_tel('Batman ' + m['ad'] + ' Servisi')}
 <p>Batman merkez ve ilçelerinde <strong>{k(m['ad'])}</strong> buzdolabı, çamaşır makinesi,
 bulaşık makinesi ve derin dondurucu onarımı yapıyoruz. Marka ayrımı yapmıyor, sekiz yılı aşkın
 saha tecrübemizle tüm modellere bakıyoruz.</p>
@@ -689,7 +689,7 @@ def bolge_sayfasi(b):
 
     return f"""<section><div class="kap"><div class="yan">
 <div class="metin">
-<h1>{k(b['ad'])} Beyaz Eşya Servisi</h1>
+{h1_tel(b['ad'] + ' Beyaz Eşya Servisi')}
 <p>{k(b['ad'])} bölgesinde buzdolabı, çamaşır makinesi, bulaşık makinesi ve derin dondurucu
 onarımı yapıyoruz. Varış süremiz <strong>{k(b['sure'])}</strong>.</p>
 {metin}

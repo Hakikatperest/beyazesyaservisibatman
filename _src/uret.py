@@ -78,7 +78,7 @@ def uret_arizalar():
 
         govde = f"""<section><div class="kap"><div class="yan">
 <div class="metin">
-<h1>{B.k(a['soru'])}</h1>
+{B.h1_tel(a['soru'])}
 {gorsel}
 {a['govde']}
 {video}
